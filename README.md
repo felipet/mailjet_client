@@ -1,2 +1,25 @@
-# mailjet_client
-A Rust client for the Mailjet API
+# A Rust client for Mailjet's API
+
+This is another implementation of a client written in Rust for [Mailjet's API](https://dev.mailjet.com/email/reference/overview/).
+
+**What's [Mailjet](https://www.mailjet.com/)?** Mailjet is a web service that offers a platform for sending emails to many recipients using templates, and automations. Though they offer a nice and powerful web interface for their service, they also offer a REST API along a free tier for people sending low amounts of emails per month. This is a perfect combination for people that might need to deliver a few emails from a web service written in Rust (like me). However, they don't provide a Rust Client.
+
+As the day of writting this, there are 2 available clients for the API written in Rust:
+- [Mailjet-rs](https://crates.io/crates/mailjet-rs)
+- [Mailjet_api_wrapper](https://crates.io/crates/mailjet_api_wrapper)
+
+However, none of those include some of the features that I need as I aim to integrate this library into an existing web service implemented using [Actix-web](https://actix.rs/). That's the main reason to write another client implementation. Check out this implementation's features to assess whether this client suits better your needs than any of the other existing crates.
+
+## Features
+
+- **Tracing support via [Tracing](https://crates.io/crates/tracing)**: the library code includes tracing calls using `Tracing`'s API.
+- **Usage of [Reqwest](https://crates.io/crates/reqwest) as internal HTTP client**: `Reqwest` is my crate of choice for this use-case scenarios. The crate `Reqwest-tracing` is also addedd to enable tracing support for the internal HTTP client.
+- **High level of test coverage** and support for CI. Given that I aim to include this crate into another service that needs a high level of reliavility, not including a proper set of tests was a non-go.
+
+## Caveats
+
+Offering a full client implementation is not my initial plan, so **don't expect a full 1:1 Rust implementation of the existing API** clients provided by Mailjet. This project is open-sourced, so if you need to cover some missing endpoint of Mailjet's API, feel free to open a new Issue describing your needs. Either if you plan to develop it by yourself, or you need somebody else to do it, it will be good to know that there's interest on adding such missing feature to the client.
+
+## Contributing 
+
+If you are interesting in contributing to this repository, feel free to contact me before starting to type new code as a crazy monkey.
