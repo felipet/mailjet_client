@@ -13,4 +13,6 @@ pub enum ClientError {
     WrongApiVersion,
     #[error("Missing Mailjet API key token")]
     MissingApiKey,
+    #[error("Unknown error")]
+    UnknownError,
 }
