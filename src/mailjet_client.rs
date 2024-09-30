@@ -5,7 +5,7 @@
 
 //! Client module.
 
-use crate::{ApiVersion, ClientError};
+use crate::{ApiVersion, ClientError, Response};
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
 use secrecy::SecretString;
@@ -203,6 +203,10 @@ impl MailjetClient {
     /// Change the target external API version (Mailjet).
     pub fn use_api_version(&mut self, version: ApiVersion) {
         self.api_version = version;
+    }
+
+    pub fn send_email(&self) -> Result<Response, ClientError> {
+        todo!("Send email not implemented")
     }
 }
 

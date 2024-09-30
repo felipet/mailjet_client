@@ -104,6 +104,9 @@ pub mod data_objects {
     pub use responses::{EmailType, Sender, SenderQuery, Status};
 }
 
+// Re-export
+pub use data_objects::Response;
+
 mod mailjet_client;
 // Re-export the client.
 pub use mailjet_client::{MailjetClient, MailjetClientBuilder};
