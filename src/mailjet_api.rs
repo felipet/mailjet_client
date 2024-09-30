@@ -15,6 +15,29 @@ pub enum ApiVersion {
     V3_1,
 }
 
+/// A simple look-up table that builds the URL of a particular endpoint.
+///
+/// # Description
+///
+/// This object abstracts the endpoint URLs of the external REST API (Mailjet) from the client's code.
+/// To build the full URL of a particular endpoint of the external API, the base URL is needed (set in the client's
+/// constructor) along the API version and the endpoint aimed to use. This object builds the internal path of the URL,
+/// so updates to the API version or minor changes in the endpoint routes might not affect the client's implementation.
+pub struct ApiUrl;
+
+impl ApiUrl {
+    /// URL of the endpoint [`/send`][send]
+    /// [send]: https://dev.mailjet.com/email/reference/send-emails/
+    pub fn send(api_version: ApiVersion) -> String {
+        let endpoint = "send";
+
+        match api_version {
+            ApiVersion::V3_1 => format!("{api_version}/{endpoint}"),
+            _ => format!("{}/{endpoint}", ApiVersion::default()),
+        }
+    }
+}
+
 impl TryFrom<&str> for ApiVersion {
     type Error = ClientError;
 
