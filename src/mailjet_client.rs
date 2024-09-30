@@ -30,7 +30,7 @@ impl Default for MailjetClientBuilder {
             api_user: Some(SecretString::new("None".into())),
             api_key: Some(SecretString::new("None".into())),
             api_url: Some("https://api.mailjet.com".into()),
-            api_version: Some("v3".into()),
+            api_version: Some(ApiVersion::default().to_string()),
         }
     }
 }
@@ -199,6 +199,11 @@ impl MailjetClient {
             api_version,
         })
     }
+
+    /// Change the target external API version (Mailjet).
+    pub fn use_api_version(&mut self, version: ApiVersion) {
+        self.api_version = version;
+    }
 }
 
 #[cfg(test)]
@@ -257,5 +262,15 @@ mod tests {
         assert_eq!(client.api_key.expose_secret(), api_key.expose_secret());
         assert_eq!(client.api_url, url);
         assert_eq!(client.api_version, version);
+    }
+
+    #[rstest]
+    fn change_api_version() {
+        let mut client = MailjetClientBuilder::default().build().unwrap();
+        assert_eq!(client.api_version, ApiVersion::default());
+        client.api_version = ApiVersion::V3_1;
+        assert_eq!(client.api_version, ApiVersion::V3_1);
+        client.use_api_version(ApiVersion::V3);
+        assert_eq!(client.api_version, ApiVersion::V3);
     }
 }
