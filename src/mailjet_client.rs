@@ -5,11 +5,16 @@
 
 //! Client module.
 
-use crate::{ApiVersion, ClientError, Response};
+use crate::{
+    data_objects::{ObjectType, ResponseObject, SendEmailParams, SendResponse, SendResponses},
+    mailjet_api::ApiUrl,
+    ApiVersion, ClientError, Response,
+};
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
-use secrecy::SecretString;
-use tracing::debug;
+use secrecy::{ExposeSecret, SecretString};
+use serde::Deserialize;
+use tracing::{debug, instrument, trace};
 
 pub struct MailjetClientBuilder {
     email_address: Option<String>,
@@ -168,7 +173,7 @@ impl MailjetClient {
 
         let api_url = match api_url {
             Some(url) => url.into(),
-            None => "https://api.mailjet.com/".into(),
+            None => "https://api.mailjet.com".into(),
         };
 
         let api_version = match api_version {
@@ -205,8 +210,93 @@ impl MailjetClient {
         self.api_version = version;
     }
 
-    pub fn send_email(&self) -> Result<Response, ClientError> {
-        todo!("Send email not implemented")
+    pub async fn send_email<'a>(
+        &self,
+        request: &SendEmailParams<'a>,
+    ) -> Result<SendResponses, ClientError> {
+        match self.api_version {
+            ApiVersion::V3 => {
+                trace!("Sending email to the external API (v3)");
+                todo!("send email for V3 is unimplemented")
+            }
+            ApiVersion::V3_1 => {
+                trace!("Sending email to the external API (v3.1)");
+                self.send_email_v3_1(request).await
+            }
+        }
+    }
+
+    #[instrument]
+    pub async fn send_email_v3_1<'a>(
+        &self,
+        request: &SendEmailParams<'a>,
+    ) -> Result<SendResponses, ClientError> {
+        debug!("Request parameters: {:#?}", request);
+
+        // Build a new request using the HTTP client.
+        let request = self
+            .http_client
+            .post(format!(
+                "{}/{}",
+                self.api_url,
+                ApiUrl::send(&self.api_version)
+            ))
+            .basic_auth(
+                self.api_user.expose_secret(),
+                Some(&self.api_key.expose_secret()),
+            )
+            .json(&request)
+            .build()
+            .unwrap();
+
+        debug!("POST request: {:#?}", request);
+
+        // Send the prepared request to the external API.
+        let raw_response = self
+            .http_client
+            .execute(request)
+            .await
+            .map_err(|e| ClientError::ExternalError(e.to_string()))?;
+
+        debug!("Received response: {:#?}", raw_response);
+
+        let code = raw_response.status().as_u16();
+        // The POST request was successfully executed.
+        if code == 201 {
+            let payload = raw_response
+                .text()
+                .await
+                .map_err(|e| ClientError::UnknownError(e.to_string()))?;
+
+            // Temporal struct to implement a deserializer.
+            #[derive(Deserialize, Debug)]
+            #[serde(rename_all = "PascalCase")]
+            #[allow(dead_code)]
+            struct TempResponse {
+                pub messages: Vec<SendResponse>,
+            }
+
+            let mut payload: TempResponse = serde_json::from_str(payload.as_str())
+                .map_err(|e| ClientError::UnknownError(e.to_string()))?;
+
+            Ok(SendResponses {
+                messages: payload
+                    .messages
+                    .drain(..)
+                    .map(|e| Box::<dyn ResponseObject>::from(Box::new(e)))
+                    .collect(),
+            })
+        } else if code == 400 {
+            Err(ClientError::BadRequest(format!(
+                "status_code: {}, payload: {:#?}",
+                code, raw_response
+            )))
+        } else {
+            Err(ClientError::UnknownError(format!(
+                "status_code: {}, payload: {:#?}",
+                code, raw_response
+            )))
+        }
     }
 }
 

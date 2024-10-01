@@ -101,11 +101,13 @@ pub mod data_objects {
 
     mod responses;
 
-    pub use responses::{EmailType, Sender, SenderQuery, Status};
+    pub use responses::*;
 
     mod message;
-    mod queries;
-    pub use message::{Attachment, Message, NameAndEmail, Track};
+    pub use message::{Attachment, Message, MessageBuilder, MessageProperty, NameAndEmail, Track};
+
+    mod request;
+    pub use request::SendEmailParams;
 }
 
 // Re-export

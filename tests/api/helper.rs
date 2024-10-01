@@ -4,10 +4,13 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
 use anyhow::{anyhow, Result};
-use mailjet_client::{ClientError, MailjetClient, Response};
+use mailjet_client::{
+    data_objects::{SendEmailParams, SendResponses},
+    ClientError, MailjetClient,
+};
 use once_cell::sync::Lazy;
 use secrecy::SecretString;
-use tracing::level_filters::LevelFilter;
+use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::{fmt, layer::SubscriberExt, registry, util::SubscriberInitExt, Layer};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
@@ -62,15 +65,19 @@ impl TestApp {
         Ok(TestApp { api_client })
     }
 
-    pub fn send_email(&mut self) -> Result<Response, ClientError> {
-        self.api_client
-            .use_api_version(mailjet_client::ApiVersion::default());
-        self.api_client.send_email()
-    }
+    // pub async fn send_email(&mut self, request: &SendEmailParams) -> Result<Response, ClientError> {
+    //     self.api_client
+    //         .use_api_version(mailjet_client::ApiVersion::default());
+    //     self.api_client.send_email(&request).await
+    // }
 
-    pub fn send_email_v3_1(&mut self) -> Result<Response, ClientError> {
+    pub async fn send_email_v3_1<'a>(
+        &mut self,
+        request: &SendEmailParams<'a>,
+    ) -> Result<SendResponses, ClientError> {
+        info!("Test email using API v3.1");
         self.api_client
             .use_api_version(mailjet_client::ApiVersion::V3_1);
-        self.api_client.send_email()
+        self.api_client.send_email(&request).await
     }
 }

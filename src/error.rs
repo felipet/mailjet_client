@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq, Eq)]
 pub enum ClientError {
     #[error("An error was found in the internal HTTP Client")]
     HTTPClient,
@@ -14,5 +14,9 @@ pub enum ClientError {
     #[error("Missing Mailjet API key token")]
     MissingApiKey,
     #[error("Unknown error")]
-    UnknownError,
+    UnknownError(String),
+    #[error("External error")]
+    ExternalError(String),
+    #[error("The given data is formatted wrongly")]
+    BadRequest(String),
 }

@@ -28,7 +28,7 @@ pub struct ApiUrl;
 impl ApiUrl {
     /// URL of the endpoint [`/send`][send]
     /// [send]: https://dev.mailjet.com/email/reference/send-emails/
-    pub fn send(api_version: ApiVersion) -> String {
+    pub fn send(api_version: &ApiVersion) -> String {
         let endpoint = "send";
 
         match api_version {
