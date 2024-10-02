@@ -115,10 +115,13 @@ pub use data_objects::Response;
 
 mod mailjet_client;
 // Re-export the client.
-pub use mailjet_client::{MailjetClient, MailjetClientBuilder};
+pub use mailjet_client::MailjetClient;
 
 mod error;
 pub use error::ClientError;
 
 mod mailjet_api;
 pub use mailjet_api::ApiVersion;
+
+mod mailjet_client_builder;
+pub use mailjet_client_builder::MailjetClientBuilder;

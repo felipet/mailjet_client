@@ -6,107 +6,15 @@
 //! Client module.
 
 use crate::{
-    data_objects::{ObjectType, ResponseObject, SendEmailParams, SendResponse, SendResponses},
+    data_objects::{ResponseObject, SendEmailParams, SendResponse, SendResponses},
     mailjet_api::ApiUrl,
-    ApiVersion, ClientError, Response,
+    ApiVersion, ClientError, MailjetClientBuilder,
 };
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use tracing::{debug, instrument, trace};
-
-pub struct MailjetClientBuilder {
-    email_address: Option<String>,
-    email_name: Option<String>,
-    user_agent: Option<String>,
-    api_user: Option<SecretString>,
-    api_key: Option<SecretString>,
-    api_url: Option<String>,
-    api_version: Option<String>,
-}
-
-impl Default for MailjetClientBuilder {
-    fn default() -> Self {
-        MailjetClientBuilder {
-            email_address: None,
-            email_name: None,
-            user_agent: None,
-            api_user: Some(SecretString::new("None".into())),
-            api_key: Some(SecretString::new("None".into())),
-            api_url: Some("https://api.mailjet.com".into()),
-            api_version: Some(ApiVersion::default().to_string()),
-        }
-    }
-}
-
-impl MailjetClientBuilder {
-    pub fn with_email_address(mut self, email: &str) -> MailjetClientBuilder {
-        self.email_address = Some(email.to_string());
-
-        self
-    }
-
-    pub fn with_email_name(mut self, name: &str) -> MailjetClientBuilder {
-        self.email_name = Some(name.to_string());
-
-        self
-    }
-
-    pub fn with_user_agent(mut self, name: &str) -> MailjetClientBuilder {
-        self.user_agent = Some(name.into());
-
-        self
-    }
-
-    pub fn with_api_user(mut self, api_user: SecretString) -> MailjetClientBuilder {
-        self.api_user = Some(api_user);
-
-        self
-    }
-
-    pub fn with_api_key(mut self, api_key: SecretString) -> MailjetClientBuilder {
-        self.api_key = Some(api_key);
-
-        self
-    }
-
-    pub fn with_api_url(mut self, url: &str) -> MailjetClientBuilder {
-        self.api_url = Some(url.to_string());
-
-        self
-    }
-
-    pub fn with_api_version(mut self, version: &str) -> MailjetClientBuilder {
-        self.api_version = Some(version.into());
-
-        self
-    }
-
-    pub fn new(api_user: SecretString, api_key: SecretString) -> MailjetClientBuilder {
-        MailjetClientBuilder {
-            api_user: Some(api_user),
-            api_key: Some(api_key),
-            email_address: None,
-            email_name: None,
-            user_agent: None,
-            api_url: None,
-            api_version: None,
-        }
-    }
-
-    pub fn build(self) -> Result<MailjetClient, ClientError> {
-        MailjetClient::new(
-            self.api_user.unwrap(),
-            self.api_key.unwrap(),
-            self.email_address.as_deref(),
-            self.email_name.as_deref(),
-            self.user_agent.as_deref(),
-            self.api_url.as_deref(),
-            self.api_version.as_deref(),
-        )
-    }
-}
 
 /// This object implements a client for [Mailjet's][mapi] REST API.
 ///
