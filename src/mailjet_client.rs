@@ -6,9 +6,9 @@
 //! Client module.
 
 use crate::{
-    data_objects::{ResponseObject, SendEmailParams, SendResponse, SendResponses},
+    data_objects::{Response, ResponseObject, SendEmailParams, SendResponseObject},
     mailjet_api::ApiUrl,
-    ApiVersion, ClientError, MailjetClientBuilder,
+    ApiVersion, ClientError,
 };
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
@@ -121,7 +121,7 @@ impl MailjetClient {
     pub async fn send_email<'a>(
         &self,
         request: &SendEmailParams<'a>,
-    ) -> Result<SendResponses, ClientError> {
+    ) -> Result<Response, ClientError> {
         match self.api_version {
             ApiVersion::V3 => {
                 trace!("Sending email to the external API (v3)");
@@ -138,7 +138,7 @@ impl MailjetClient {
     pub async fn send_email_v3_1<'a>(
         &self,
         request: &SendEmailParams<'a>,
-    ) -> Result<SendResponses, ClientError> {
+    ) -> Result<Response, ClientError> {
         debug!("Request parameters: {:#?}", request);
 
         // Build a new request using the HTTP client.
@@ -168,9 +168,9 @@ impl MailjetClient {
 
         debug!("Received response: {:#?}", raw_response);
 
-        let code = raw_response.status().as_u16();
+        let response_code = raw_response.status().as_u16();
         // The POST request was successfully executed.
-        if code == 201 {
+        if response_code == 201 {
             let payload = raw_response
                 .text()
                 .await
@@ -181,28 +181,31 @@ impl MailjetClient {
             #[serde(rename_all = "PascalCase")]
             #[allow(dead_code)]
             struct TempResponse {
-                pub messages: Vec<SendResponse>,
+                pub messages: Vec<SendResponseObject>,
             }
 
             let mut payload: TempResponse = serde_json::from_str(payload.as_str())
                 .map_err(|e| ClientError::UnknownError(e.to_string()))?;
+            // Cast the internal objects of the array as trait objects.
+            let response = payload
+                .messages
+                .drain(..)
+                .map(|e| Box::<dyn ResponseObject>::from(Box::new(e)))
+                .collect();
 
-            Ok(SendResponses {
-                messages: payload
-                    .messages
-                    .drain(..)
-                    .map(|e| Box::<dyn ResponseObject>::from(Box::new(e)))
-                    .collect(),
+            Ok(Response {
+                status_code: response_code,
+                payload: Some(response),
             })
-        } else if code == 400 {
+        } else if response_code == 400 {
             Err(ClientError::BadRequest(format!(
                 "status_code: {}, payload: {:#?}",
-                code, raw_response
+                response_code, raw_response
             )))
         } else {
             Err(ClientError::UnknownError(format!(
                 "status_code: {}, payload: {:#?}",
-                code, raw_response
+                response_code, raw_response
             )))
         }
     }
@@ -211,6 +214,7 @@ impl MailjetClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::MailjetClientBuilder;
     use pretty_assertions::assert_eq;
     use rstest::*;
     use secrecy::{ExposeSecret, SecretString};

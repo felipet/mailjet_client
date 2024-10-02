@@ -18,12 +18,12 @@ use secrecy::SecretString;
 /// ## Example
 ///
 /// ```rust
-/// use mailjetclient::{MailjetClientBuilder};
+/// use mailjet_client::{MailjetClientBuilder};
 /// use secrecy::SecretString;
 ///
 /// let client = MailjetClientBuilder::default()
-///     .with_api_user(SecretString::from("A hash"))
-///     .with_api_key(SecretString::from("A hash"))
+///     .with_api_user(SecretString::from("A hash".to_string()))
+///     .with_api_key(SecretString::from("A hash".to_string()))
 ///     .build();
 ///
 /// ```

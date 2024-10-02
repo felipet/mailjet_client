@@ -4,7 +4,7 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
 //! Data objects related to the endpoint `/sender` of Mailjet's REST API.
-use crate::data_objects::{ObjectType, ResponseObject};
+use crate::data_objects::ResponseObject;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -60,14 +60,14 @@ pub struct SenderQuery {
     pub sort: Option<String>,
 }
 
-#[derive(Debug)]
-pub struct SendResponses {
-    pub messages: ObjectType,
-}
+// #[derive(Debug)]
+// pub struct SendResponse {
+//     pub messages: SendResponseObject,
+// }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
-pub struct SendResponse {
+pub struct SendResponseObject {
     pub status: ResponseStatus,
     pub errors: Option<Vec<ResponseError>>,
     pub to: Option<Vec<MessageError>>,
@@ -75,7 +75,7 @@ pub struct SendResponse {
     pub bcc: Option<Vec<MessageError>>,
 }
 
-impl ResponseObject for SendResponse {}
+impl ResponseObject for SendResponseObject {}
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "lowercase")]
