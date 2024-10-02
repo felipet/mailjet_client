@@ -129,3 +129,71 @@ impl MailjetClientBuilder {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+    use rstest::*;
+    use secrecy::ExposeSecret;
+    use uuid::Uuid;
+
+    struct Keys {
+        pub user: String,
+        pub key: String,
+    }
+
+    #[fixture]
+    fn keys() -> Keys {
+        Keys {
+            user: Uuid::new_v4().to_string(),
+            key: Uuid::new_v4().to_string(),
+        }
+    }
+
+    #[rstest]
+    fn client_from_new(keys: Keys) {
+        let api_user = SecretString::from(keys.user.clone());
+        let api_key = SecretString::from(keys.key.clone());
+
+        let client = MailjetClientBuilder::new(api_user, api_key).build();
+        assert!(client.is_ok());
+    }
+
+    #[rstest]
+    fn client_from_builder(keys: Keys) {
+        let api_user = SecretString::from(keys.user.clone());
+        let api_key = SecretString::from(keys.key.clone());
+        let email = "janedoe@mail.com";
+        let name = "jane doe";
+        let agent = "test agent";
+
+        let client_builder = MailjetClientBuilder::default()
+            .with_api_key(api_key.clone())
+            .with_api_user(api_user.clone())
+            .with_email_address(email)
+            .with_email_name(name)
+            .with_user_agent(agent)
+            .with_api_version(&ApiVersion::default().to_string());
+
+        assert_eq!(client_builder.api_user.unwrap().expose_secret(), keys.user);
+        assert_eq!(client_builder.api_key.unwrap().expose_secret(), keys.key);
+        assert_eq!(client_builder.email_name.unwrap(), name);
+        assert_eq!(client_builder.user_agent.unwrap(), agent);
+        assert_eq!(
+            client_builder.api_version.unwrap(),
+            ApiVersion::default().to_string()
+        );
+
+        let client_builder = MailjetClientBuilder::default()
+            .with_api_key(api_key)
+            .with_api_user(api_user)
+            .with_email_address(email)
+            .with_email_name(name)
+            .with_user_agent(agent)
+            .with_api_version(&ApiVersion::default().to_string())
+            .build();
+
+        assert!(client_builder.is_ok());
+    }
+}
