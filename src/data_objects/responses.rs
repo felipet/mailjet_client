@@ -54,6 +54,8 @@ pub struct MessageObject {
     pub message_href: Option<String>,
 }
 
+impl ResponseObject for MessageObject {}
+
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum EmailType {

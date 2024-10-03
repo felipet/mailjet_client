@@ -2,6 +2,8 @@ use names::Generator;
 use serde::Serialize;
 use std::collections::HashMap;
 
+use super::RequestObject;
+
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Message {
@@ -32,6 +34,54 @@ pub struct Message {
     pub url_tags: Option<String>,
     pub headers: Option<HashMap<String, String>>,
     pub variables: Option<HashMap<String, String>>,
+}
+
+/// Object that represents the parameters needed to send a message using the API::v3.0
+#[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct SimpleMessage {
+    pub from_email: Option<String>,
+    pub from_name: Option<String>,
+    pub sender: Option<bool>,
+    pub recipients: Vec<NameAndEmail>,
+    pub to: Option<String>,
+    pub cc: Option<String>,
+    pub bcc: Option<String>,
+    pub subject: Option<String>,
+    #[serde(rename = "Text-part")]
+    pub text_part: Option<String>,
+    #[serde(rename = "Html-part")]
+    pub html_part: Option<String>,
+    #[serde(rename = "Mj-TemplateID")]
+    pub template_id: Option<i64>,
+    #[serde(rename = "Mj-TemplateLanguage")]
+    pub template_language: Option<bool>,
+    #[serde(rename = "Mj-TemplateErrorReporting")]
+    pub template_error_reporting: Option<String>,
+    #[serde(rename = "Mj-TemplateErrorDeliver")]
+    pub template_error_deliver: Option<String>,
+    pub attachments: Vec<Attachment>,
+    pub inline_attachments: Vec<Attachment>,
+    #[serde(rename = "Mj-prio")]
+    pub prio: Option<i8>,
+    #[serde(rename = "Mj-campaign")]
+    pub campaign: Option<String>,
+    #[serde(rename = "Mj-deduplicatecampaign")]
+    pub deduplicate_campaign: Option<i64>,
+    #[serde(rename = "Mj-trackopen")]
+    pub track_open: Option<u8>,
+    #[serde(rename = "Mj-CustomID")]
+    pub custom_id: Option<String>,
+    #[serde(rename = "Mj-EventPayload")]
+    pub event_payload: Option<String>,
+    pub headers: Option<String>,
+    pub vars: Option<String>,
+}
+
+impl RequestObject for SimpleMessage {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 #[derive(Debug, Default)]
@@ -153,6 +203,7 @@ pub struct MessageProperty {
 pub struct NameAndEmail {
     pub email: String,
     pub name: Option<String>,
+    pub vars: Option<String>,
 }
 
 impl Default for NameAndEmail {
@@ -162,6 +213,7 @@ impl Default for NameAndEmail {
         NameAndEmail {
             email: format!("{}@mail.com", rand_name.clone()),
             name: Some(rand_name.replace(&rand_name, "-")),
+            vars: None,
         }
     }
 }
@@ -171,6 +223,7 @@ impl NameAndEmail {
         NameAndEmail {
             email: email.into(),
             name: name.map(str::to_string),
+            vars: None,
         }
     }
 }
