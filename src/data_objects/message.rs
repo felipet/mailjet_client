@@ -1,10 +1,10 @@
 use names::Generator;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use super::RequestObject;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Message {
     pub from: NameAndEmail,
@@ -37,7 +37,7 @@ pub struct Message {
 }
 
 /// Object that represents the parameters needed to send a message using the API::v3.0
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SimpleMessage {
     pub from_email: Option<String>,
@@ -166,7 +166,7 @@ impl MessageBuilder {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct MessageProperty {
     pub from: Option<NameAndEmail>,
@@ -198,7 +198,7 @@ pub struct MessageProperty {
 }
 
 /// Simple object that includes an email and a linked name (optional).
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct NameAndEmail {
     pub email: String,
@@ -229,7 +229,7 @@ impl NameAndEmail {
 }
 
 /// Attachment object.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Attachment {
     pub filename: String,
@@ -237,7 +237,7 @@ pub struct Attachment {
     pub base_64_content: String,
 }
 
-#[derive(Debug, Default, Serialize, PartialEq)]
+#[derive(Debug, Default, Serialize, PartialEq, Deserialize)]
 pub enum Track {
     #[default]
     #[serde(rename = "account_default")]
