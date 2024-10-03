@@ -172,15 +172,15 @@ impl MailjetClient {
             .map_err(|e| ClientError::ExternalError(e.to_string()))?;
 
         debug!("Received response: {:#?}", raw_response);
-
         let response_code = raw_response.status().as_u16();
-        // The POST request was successfully executed.
-        if response_code == 201 {
-            let payload = raw_response
-                .text()
-                .await
-                .map_err(|e| ClientError::UnknownError(e.to_string()))?;
+        let payload = raw_response
+            .text()
+            .await
+            .map_err(|e| ClientError::UnknownError(e.to_string()))?;
+        debug!("Response's payload: {:#?}", payload);
 
+        // The POST request was successfully executed.
+        if response_code == 200 {
             // Temporal struct to implement a deserializer.
             #[derive(Deserialize, Debug)]
             #[serde(rename_all = "PascalCase")]
@@ -205,12 +205,12 @@ impl MailjetClient {
         } else if response_code == 400 {
             Err(ClientError::BadRequest(format!(
                 "status_code: {}, payload: {:#?}",
-                response_code, raw_response
+                response_code, payload
             )))
         } else {
             Err(ClientError::UnknownError(format!(
                 "status_code: {}, payload: {:#?}",
-                response_code, raw_response
+                response_code, payload
             )))
         }
     }

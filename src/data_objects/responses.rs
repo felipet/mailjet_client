@@ -7,7 +7,6 @@
 
 use crate::data_objects::ResponseObject;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// Data object returned by `/send` (v3.1) as `Messages`. See [`/send`][send].
 /// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
@@ -28,7 +27,7 @@ impl ResponseObject for SendResponseObject {}
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct ResponseError {
-    pub error_identifier: Uuid,
+    pub error_identifier: String,
     pub error_code: String,
     pub status_code: i64,
     pub error_message: String,
@@ -46,11 +45,11 @@ pub struct ResponseError {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct MessageObject {
-    pub email: String,
+    pub email: Option<String>,
     #[serde(rename = "MessageUUID")]
-    pub message_uuid: Uuid,
+    pub message_uuid: Option<String>,
     #[serde(rename = "MessageID")]
-    pub message_id: i64,
+    pub message_id: Option<i64>,
     pub message_href: Option<String>,
 }
 
