@@ -118,11 +118,11 @@ impl MessageBuilder {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct MessageProperty<'a> {
+pub struct MessageProperty {
     pub from: Option<NameAndEmail>,
     pub sender: Option<NameAndEmail>,
-    pub cc: Option<&'a [NameAndEmail]>,
-    pub bcc: Option<&'a [NameAndEmail]>,
+    pub cc: Option<Vec<NameAndEmail>>,
+    pub bcc: Option<Vec<NameAndEmail>>,
     pub reply_to: Option<NameAndEmail>,
     pub subject: Option<String>,
     pub text_part: Option<String>,
@@ -131,8 +131,8 @@ pub struct MessageProperty<'a> {
     pub template_language: Option<bool>,
     pub template_error_reporting: Option<NameAndEmail>,
     pub template_error_deliver: Option<bool>,
-    pub attachments: Option<&'a [Attachment]>,
-    pub inline_attachments: Option<&'a [Attachment]>,
+    pub attachments: Option<Vec<Attachment>>,
+    pub inline_attachments: Option<Vec<Attachment>>,
     pub priority: Option<u8>,
     pub custom_campaign: Option<String>,
     pub deduplicate_campaign: Option<bool>,

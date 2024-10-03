@@ -6,7 +6,7 @@
 //! Client module.
 
 use crate::{
-    data_objects::{Response, ResponseObject, SendEmailParams, SendResponseObject},
+    data_objects::{RequestObject, Response, ResponseObject, SendEmailParams, SendResponseObject},
     mailjet_api::ApiUrl,
     ApiVersion, ClientError,
 };
@@ -120,12 +120,12 @@ impl MailjetClient {
 
     pub async fn send_email<'a>(
         &self,
-        request: &SendEmailParams<'a>,
+        request: &impl RequestObject,
     ) -> Result<Response, ClientError> {
         match self.api_version {
             ApiVersion::V3 => {
                 trace!("Sending email to the external API (v3)");
-                todo!("send email for V3 is unimplemented")
+                self.send_email_v3(request).await
             }
             ApiVersion::V3_1 => {
                 trace!("Sending email to the external API (v3.1)");
@@ -137,9 +137,15 @@ impl MailjetClient {
     #[instrument]
     pub async fn send_email_v3_1<'a>(
         &self,
-        request: &SendEmailParams<'a>,
+        request: &impl RequestObject,
     ) -> Result<Response, ClientError> {
         debug!("Request parameters: {:#?}", request);
+
+        let request_params: &SendEmailParams =
+            match request.as_any().downcast_ref::<SendEmailParams>() {
+                Some(r) => r,
+                None => return Err(ClientError::UnknownError("Invalid request".to_string())),
+            };
 
         // Build a new request using the HTTP client.
         let request = self
@@ -153,7 +159,7 @@ impl MailjetClient {
                 self.api_user.expose_secret(),
                 Some(&self.api_key.expose_secret()),
             )
-            .json(&request)
+            .json(&request_params)
             .build()
             .unwrap();
 
@@ -190,7 +196,7 @@ impl MailjetClient {
             let response = payload
                 .messages
                 .drain(..)
-                .map(|e| Box::<dyn ResponseObject>::from(Box::new(e)))
+                .map(|e: SendResponseObject| Box::<dyn ResponseObject>::from(Box::new(e)))
                 .collect();
 
             Ok(Response {
@@ -208,6 +214,14 @@ impl MailjetClient {
                 response_code, raw_response
             )))
         }
+    }
+
+    #[instrument]
+    pub async fn send_email_v3<'a>(
+        &self,
+        request: &impl RequestObject,
+    ) -> Result<Response, ClientError> {
+        todo!()
     }
 }
 

@@ -97,7 +97,16 @@ pub mod data_objects {
     ///
     /// Every response from the API shall include a matching type in this crate that implements this trait.
     /// This is mandatory to return a generic [Response] from all the client calls provided by this client.
-    pub trait ResponseObject: std::fmt::Debug {}
+    pub trait ResponseObject: std::fmt::Debug {
+        // fn as_any(&self) -> &dyn Any;
+    }
+
+    use std::any::Any;
+
+    /// Trait that identifies any object that is used as parameters for a request to the external API.
+    pub trait RequestObject: std::fmt::Debug {
+        fn as_any(&self) -> &dyn Any;
+    }
 
     mod responses;
 

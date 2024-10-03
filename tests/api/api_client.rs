@@ -10,10 +10,10 @@ use mailjet_client::{
 };
 use rstest::*;
 use std::mem::discriminant;
-use tracing::{debug, info};
+use tracing::info;
 
 #[fixture]
-fn def_email_request<'a>() -> SendEmailParams<'a> {
+fn def_email_request<'a>() -> SendEmailParams {
     let message = MessageBuilder::default().build();
 
     SendEmailParams {
@@ -25,7 +25,7 @@ fn def_email_request<'a>() -> SendEmailParams<'a> {
 }
 
 #[rstest]
-async fn test_send_email_v3_1<'a>(def_email_request: SendEmailParams<'a>) {
+async fn test_send_email_v3_1<'a>(def_email_request: SendEmailParams) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let result = test_client.send_email_v3_1(&def_email_request).await;
 

@@ -16,9 +16,9 @@ use uuid::Uuid;
 pub struct SendResponseObject {
     pub status: ResponseStatus,
     pub errors: Option<Vec<ResponseError>>,
-    pub to: Option<Vec<MessageError>>,
-    pub cc: Option<Vec<MessageError>>,
-    pub bcc: Option<Vec<MessageError>>,
+    pub to: Option<Vec<MessageObject>>,
+    pub cc: Option<Vec<MessageObject>>,
+    pub bcc: Option<Vec<MessageObject>>,
 }
 
 impl ResponseObject for SendResponseObject {}
@@ -35,17 +35,23 @@ pub struct ResponseError {
     pub error_related_to: Vec<String>,
 }
 
-/// Data object for the field `To`, `Bcc`, `Cc` in the response of `/send`. See [`/send`][send].
+/// Data object for the field `To`, `Bcc`, `Cc` in the response of `/send` and responses from API v3.0
+///
+/// # Description
+///
+/// This object is shared between some fields returned by endpoints that implements the API v3.1 and as
+/// main payload of endpoints that implement the API v3.0.
+/// See [`/send`][send], for example.
 /// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
-pub struct MessageError {
+pub struct MessageObject {
     pub email: String,
     #[serde(rename = "MessageUUID")]
     pub message_uuid: Uuid,
     #[serde(rename = "MessageID")]
     pub message_id: i64,
-    pub message_href: String,
+    pub message_href: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]

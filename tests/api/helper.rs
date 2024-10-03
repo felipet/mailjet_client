@@ -5,7 +5,7 @@
 
 use anyhow::{anyhow, Result};
 use mailjet_client::{
-    data_objects::{Response, SendEmailParams},
+    data_objects::{RequestObject, Response},
     ClientError, MailjetClient,
 };
 use once_cell::sync::Lazy;
@@ -71,13 +71,13 @@ impl TestApp {
     //     self.api_client.send_email(&request).await
     // }
 
-    pub async fn send_email_v3_1<'a>(
+    pub async fn send_email_v3_1(
         &mut self,
-        request: &SendEmailParams<'a>,
+        request: &impl RequestObject,
     ) -> Result<Response, ClientError> {
         info!("Test email using API v3.1");
         self.api_client
             .use_api_version(mailjet_client::ApiVersion::V3_1);
-        self.api_client.send_email(&request).await
+        self.api_client.send_email(request).await
     }
 }

@@ -5,16 +5,29 @@
 
 //! Translations of data objects use as params for the endpoints of Mailjet's API.
 
-use crate::data_objects::{Message, MessageProperty};
+use crate::data_objects::{Message, MessageProperty, RequestObject};
 use serde::Serialize;
+use std::any::Any;
 
+/// Object that translates the parameters allowed when sending a POST to the `/send` endpoint (v3.1).
+///
+/// # Description
+///
+/// All the wrapped fields are optional. See [`/send`][send].
+/// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct SendEmailParams<'a> {
+pub struct SendEmailParams {
     pub sandbox_mode: Option<bool>,
     pub advance_error_handling: Option<bool>,
-    pub globals: Option<MessageProperty<'a>>,
+    pub globals: Option<MessageProperty>,
     pub messages: Vec<Message>,
+}
+
+impl RequestObject for SendEmailParams {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 }
 
 #[derive(Serialize, Debug, Clone, Default)]
