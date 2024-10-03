@@ -65,12 +65,6 @@ impl TestApp {
         Ok(TestApp { api_client })
     }
 
-    // pub async fn send_email(&mut self, request: &SendEmailParams) -> Result<Response, ClientError> {
-    //     self.api_client
-    //         .use_api_version(mailjet_client::ApiVersion::default());
-    //     self.api_client.send_email(&request).await
-    // }
-
     pub async fn send_email_v3_1(
         &mut self,
         request: &impl RequestObject,
@@ -78,6 +72,16 @@ impl TestApp {
         info!("Test email using API v3.1");
         self.api_client
             .use_api_version(mailjet_client::ApiVersion::V3_1);
+        self.api_client.send_email(request).await
+    }
+
+    pub async fn send_email_v3(
+        &mut self,
+        request: &impl RequestObject,
+    ) -> Result<Response, ClientError> {
+        info!("Test email using API v3");
+        self.api_client
+            .use_api_version(mailjet_client::ApiVersion::V3);
         self.api_client.send_email(request).await
     }
 }

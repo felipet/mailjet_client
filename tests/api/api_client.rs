@@ -5,7 +5,7 @@
 
 use crate::helper::TestApp;
 use mailjet_client::{
-    data_objects::{MessageBuilder, SendEmailParams},
+    data_objects::{MessageBuilder, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
@@ -13,7 +13,7 @@ use std::mem::discriminant;
 use tracing::info;
 
 #[fixture]
-fn def_email_request<'a>() -> SendEmailParams {
+fn email_request_v3_1() -> SendEmailParams {
     let message = MessageBuilder::default().build();
 
     SendEmailParams {
@@ -24,10 +24,29 @@ fn def_email_request<'a>() -> SendEmailParams {
     }
 }
 
+#[fixture]
+fn email_request_v3() -> SimpleMessage {
+    SimpleMessage::default()
+}
+
 #[rstest]
-async fn test_send_email_v3_1<'a>(def_email_request: SendEmailParams) {
+async fn test_send_email_v3_1(email_request_v3_1: SendEmailParams) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
-    let result = test_client.send_email_v3_1(&def_email_request).await;
+    let result = test_client.send_email_v3_1(&email_request_v3_1).await;
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    info!("Errors: {:#?}", errors);
+    assert_eq!(
+        discriminant(&errors),
+        discriminant(&ClientError::BadRequest("".to_string()))
+    );
+}
+
+#[rstest]
+async fn test_send_email_v3(email_request_v3: SimpleMessage) {
+    let mut test_client = TestApp::new().expect("Failed to build a test client");
+    let result = test_client.send_email_v3(&email_request_v3).await;
 
     assert!(result.is_err());
     let errors = result.err().unwrap();

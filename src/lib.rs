@@ -113,7 +113,9 @@ pub mod data_objects {
     pub use responses::*;
 
     mod message;
-    pub use message::{Attachment, Message, MessageBuilder, MessageProperty, NameAndEmail, Track};
+    pub use message::{
+        Attachment, Message, MessageBuilder, MessageProperty, NameAndEmail, SimpleMessage, Track,
+    };
 
     mod request;
     pub use request::SendEmailParams;
