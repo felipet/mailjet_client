@@ -37,7 +37,7 @@
 ///
 /// # Description
 ///
-/// The objects defined in the REST [API][mapi] are directly traslated into Rust's types using naming conventions of
+/// The objects defined in the REST [API][mapi] are directly translated into Rust's types using naming conventions of
 /// Rust (snake case for `struct`'s members). Be aware of that, because some names in the objects defined in the REST
 /// API don't follow any known convention. _PascalCase_ seems to be the usual choice for them, but some object's
 /// atributes get akward names such as ***DnsID***. The objects defined here in strictly follow the snake case naming
