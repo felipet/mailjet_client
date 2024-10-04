@@ -66,9 +66,9 @@
 ///   user needs to worry about it. **A client's call will return all the matches at once.**
 ///
 /// Only the two first items of the list are included in the response objects returned by this client. To cope
-/// with the problem of a non-homogeneous response data object definition, the trait [ResponseObject] is defined
-/// in this crate. This way, a common type [crate::data_objects::Response] is returned by every call of the client
-/// that wraps a GET method of the REST API.
+/// with the problem of a non-homogeneous response data object definition, the trait
+/// [crate::data_objects::ResponseObject] is defined in this crate. This way, a common type
+/// [crate::data_objects::Response] is returned by every call of the client that wraps a GET method of the REST API.
 ///
 /// [mapi]: https://dev.mailjet.com/email/reference/overview/
 pub mod data_objects {

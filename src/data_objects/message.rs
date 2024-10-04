@@ -14,9 +14,7 @@ use std::collections::HashMap;
 ///
 /// # Description
 ///
-/// This object matches the allowed parameters defined in [`/send`][send].
-///
-/// [send]: This object matches the allowed parameters defined in [`/send`][send].
+/// This object matches the allowed parameters defined in [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send).
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Message {
@@ -53,11 +51,9 @@ pub struct Message {
 ///
 /// # Description
 ///
-/// This object matches the allowed parameters defined in [`/send`][send]. However, some
-/// parameters are missing in this struct. Mostly, all the parameters that start by *Mj-* are
+/// This object matches the allowed parameters defined in [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send).
+/// However, some parameters are missing in this struct. Mostly, all the parameters that start by *Mj-* are
 /// skipped due to problems with the request.
-///
-/// [send]: https://dev.mailjet.com/email/reference/send-emails/#v3_post_send
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SimpleMessage {

@@ -41,6 +41,7 @@ impl ApiUrl {
         let endpoint = "contact";
 
         // As of today, this endpoint is only supported by the API v3.0.
+        #[allow(clippy::match_single_binding)]
         match api_version {
             _ => format!("{}/REST/{endpoint}", ApiVersion::default()),
         }

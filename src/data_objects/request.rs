@@ -13,8 +13,7 @@ use std::any::Any;
 ///
 /// # Description
 ///
-/// All the wrapped fields are optional. See [`/send`][send].
-/// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
+/// All the wrapped fields are optional. See [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send).
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SendEmailParams {

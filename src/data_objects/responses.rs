@@ -8,8 +8,7 @@
 use crate::data_objects::ResponseObject;
 use serde::{Deserialize, Serialize};
 
-/// Data object returned by `/send` (v3.1) as `Messages`. See [`/send`][send].
-/// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
+/// Data object returned by `/send` (v3.1) as `Messages`. See [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send)
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct SendResponseObject {
@@ -22,8 +21,7 @@ pub struct SendResponseObject {
 
 impl ResponseObject for SendResponseObject {}
 
-/// Data object for the field `Errors` in the response of `/send`. See [`/send`][send].
-/// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
+/// Data object for the field `Errors` in the response of `/send`. See [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send)
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct ResponseError {
@@ -40,8 +38,7 @@ pub struct ResponseError {
 ///
 /// This object is shared between some fields returned by endpoints that implements the API v3.1 and as
 /// main payload of endpoints that implement the API v3.0.
-/// See [`/send`][send], for example.
-/// [send]: https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send
+/// See [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send), for example.
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct MessageObject {
