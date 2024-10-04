@@ -6,7 +6,7 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{MessageBuilder, SendEmailParams, SimpleMessage},
+    data_objects::{ContactQuery, MessageBuilder, NameAndEmail, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
@@ -35,8 +35,12 @@ async fn valid_email_request_v3_1() -> SendEmailParams {
 }
 
 #[fixture]
-fn email_request_v3() -> SimpleMessage {
-    SimpleMessage::default()
+async fn valid_email_request_v3() -> SimpleMessage {
+    let valid_mail = read_to_string("tests/api/data/valid_mail_v3.json")
+        .await
+        .expect("Failed to load valid message example from JSON file");
+
+    serde_json::from_str(&valid_mail).expect("Failed to parse valid email JSON")
 }
 
 /// Simple test case to check that we can send a request to the external API.
@@ -72,15 +76,25 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
 }
 
 #[rstest]
-async fn test_send_email_v3(email_request_v3: SimpleMessage) {
+async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
-    let result = test_client.send_email_v3(&email_request_v3).await;
+    let result = test_client
+        .send_email_v3(&valid_email_request_v3.await)
+        .await;
 
-    assert!(result.is_err());
-    let errors = result.err().unwrap();
-    info!("Errors: {:#?}", errors);
-    assert_eq!(
-        discriminant(&errors),
-        discriminant(&ClientError::BadRequest("".to_string()))
-    );
+    assert!(result.is_ok());
+    debug!("Response: {:#?}", result.unwrap());
+}
+
+#[rstest]
+async fn test_add_contact() {
+    let test_client = TestApp::new().expect("Failed to build a test client");
+    let request = ContactQuery {
+        is_excluded_from_campaigns: Some(true),
+        email: "demo@mailjet.com".to_string(),
+        name: Some("John Doe".into()),
+    };
+    let result = test_client.post_contact(&request).await;
+
+    info!("{:#?}", result);
 }

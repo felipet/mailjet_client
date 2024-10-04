@@ -46,3 +46,12 @@ pub struct SenderQuery {
     pub count_only: Option<bool>,
     pub sort: Option<String>,
 }
+
+/// Object that represents the allowed parameters to use the endpoint  `Contact` (POST).
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
+pub struct ContactQuery {
+    pub is_excluded_from_campaigns: Option<bool>,
+    pub name: Option<String>,
+    pub email: String,
+}

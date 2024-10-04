@@ -1,9 +1,17 @@
+//! Module that defines all the objects related to mails.
+
+use super::RequestObject;
 use names::Generator;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use super::RequestObject;
-
+/// Object that represents the parameters needed to send a message using the API::v3.1.
+///
+/// # Description
+///
+/// This object matches the allowed parameters defined in [`/send`][send].
+///
+/// [send]: This object matches the allowed parameters defined in [`/send`][send].
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Message {
@@ -36,12 +44,20 @@ pub struct Message {
     pub variables: Option<HashMap<String, String>>,
 }
 
-/// Object that represents the parameters needed to send a message using the API::v3.0
+/// Object that represents the parameters needed to send a message using the API::v3.0.
+///
+/// # Description
+///
+/// This object matches the allowed parameters defined in [`/send`][send]. However, some
+/// parameters are missing in this struct. Mostly, all the parameters that start by *Mj-* are
+/// skipped due to problems with the request.
+///
+/// [send]: https://dev.mailjet.com/email/reference/send-emails/#v3_post_send
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SimpleMessage {
-    pub from_email: Option<String>,
-    pub from_name: Option<String>,
+    pub from_email: String,
+    pub from_name: String,
     pub sender: Option<bool>,
     pub recipients: Vec<NameAndEmail>,
     pub to: Option<String>,
@@ -52,29 +68,9 @@ pub struct SimpleMessage {
     pub text_part: Option<String>,
     #[serde(rename = "Html-part")]
     pub html_part: Option<String>,
-    #[serde(rename = "Mj-TemplateID")]
-    pub template_id: Option<i64>,
-    #[serde(rename = "Mj-TemplateLanguage")]
-    pub template_language: Option<bool>,
-    #[serde(rename = "Mj-TemplateErrorReporting")]
-    pub template_error_reporting: Option<String>,
-    #[serde(rename = "Mj-TemplateErrorDeliver")]
-    pub template_error_deliver: Option<String>,
-    pub attachments: Vec<Attachment>,
-    pub inline_attachments: Vec<Attachment>,
-    #[serde(rename = "Mj-prio")]
-    pub prio: Option<i8>,
-    #[serde(rename = "Mj-campaign")]
-    pub campaign: Option<String>,
-    #[serde(rename = "Mj-deduplicatecampaign")]
-    pub deduplicate_campaign: Option<i64>,
-    #[serde(rename = "Mj-trackopen")]
-    pub track_open: Option<u8>,
-    #[serde(rename = "Mj-CustomID")]
-    pub custom_id: Option<String>,
-    #[serde(rename = "Mj-EventPayload")]
+    pub attachments: Option<Vec<Attachment>>,
+    pub inline_attachments: Option<Vec<Attachment>>,
     pub event_payload: Option<String>,
-    pub headers: Option<String>,
     pub vars: Option<String>,
 }
 
@@ -84,6 +80,24 @@ impl RequestObject for SimpleMessage {
     }
 }
 
+/// Object that implements a builder construction pattern for [Message].
+///
+/// # Description
+///
+/// This object populates the mandatory fields with the default value for the type in case no value was
+/// given. This might cause later issues when sending the request to the external API. The main use case
+/// is to build a [Message] with default values, and later on, populate only those required. This would
+/// be much quicker than calling new with a lot of `None` values.
+///
+/// ## Example
+///
+/// ```
+/// use mailjet_client::MessageBuilder;
+///
+/// let message = MessageBuilder::default()
+///     .with_from("john_doe@mail.com", Some("John Doe"))
+///     .build();
+/// ```
 #[derive(Debug, Default)]
 pub struct MessageBuilder {
     pub from: Option<NameAndEmail>,
@@ -166,6 +180,12 @@ impl MessageBuilder {
     }
 }
 
+/// Object that represents the object needed to fill the property `Globals` of the `/send` endpoint.
+///
+/// # Description
+///
+/// The parameters to send a message using the external API::v3.1 include a field named `Globals`. It is
+/// an object that is translated by this struct.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct MessageProperty {

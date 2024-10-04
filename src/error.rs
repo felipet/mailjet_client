@@ -19,4 +19,6 @@ pub enum ClientError {
     ExternalError(String),
     #[error("The given data is formatted wrongly")]
     BadRequest(String),
+    #[error("Error found while parsing data")]
+    ParseError(String),
 }

@@ -118,7 +118,7 @@ pub mod data_objects {
     };
 
     mod request;
-    pub use request::SendEmailParams;
+    pub use request::{ContactQuery, SendEmailParams};
 }
 
 // Re-export

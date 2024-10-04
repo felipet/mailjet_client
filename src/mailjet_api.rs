@@ -36,6 +36,15 @@ impl ApiUrl {
             _ => format!("{}/{endpoint}", ApiVersion::default()),
         }
     }
+
+    pub fn contact(api_version: &ApiVersion) -> String {
+        let endpoint = "contact";
+
+        // As of today, this endpoint is only supported by the API v3.0.
+        match api_version {
+            _ => format!("{}/REST/{endpoint}", ApiVersion::default()),
+        }
+    }
 }
 
 impl TryFrom<&str> for ApiVersion {
