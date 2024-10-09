@@ -75,6 +75,7 @@ impl MailjetClient {
         user_agent: Option<&str>,
         api_url: Option<&str>,
         api_version: Option<&str>,
+        force_https: Option<bool>,
     ) -> Result<Self, ClientError> {
         let user_agent: &str = if let Some(agent) = user_agent {
             agent
@@ -92,10 +93,15 @@ impl MailjetClient {
             None => ApiVersion::V3,
         };
 
+        let force_https = match force_https {
+            Some(f) => f,
+            None => true,
+        };
+
         let http_client = reqwest::ClientBuilder::new()
             .user_agent(user_agent)
             .use_native_tls()
-            .https_only(true)
+            .https_only(force_https)
             .build()
             .map_err(|_| ClientError::HTTPClient)?;
 

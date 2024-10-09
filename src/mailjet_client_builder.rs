@@ -39,6 +39,7 @@ pub struct MailjetClientBuilder {
     api_key: Option<SecretString>,
     api_url: Option<String>,
     api_version: Option<String>,
+    force_https: Option<bool>,
 }
 
 impl Default for MailjetClientBuilder {
@@ -58,6 +59,7 @@ impl Default for MailjetClientBuilder {
             api_key: Some(SecretString::new("None".into())),
             api_url: Some("https://api.mailjet.com".into()),
             api_version: Some(ApiVersion::default().to_string()),
+            force_https: Some(true),
         }
     }
 }
@@ -105,6 +107,12 @@ impl MailjetClientBuilder {
         self
     }
 
+    pub fn with_https_enforcing(mut self, force: bool) -> MailjetClientBuilder {
+        self.force_https = Some(force);
+
+        self
+    }
+
     pub fn new(api_user: SecretString, api_key: SecretString) -> MailjetClientBuilder {
         MailjetClientBuilder {
             api_user: Some(api_user),
@@ -114,6 +122,7 @@ impl MailjetClientBuilder {
             user_agent: None,
             api_url: None,
             api_version: None,
+            force_https: None,
         }
     }
 
@@ -126,6 +135,7 @@ impl MailjetClientBuilder {
             self.user_agent.as_deref(),
             self.api_url.as_deref(),
             self.api_version.as_deref(),
+            self.force_https,
         )
     }
 }
