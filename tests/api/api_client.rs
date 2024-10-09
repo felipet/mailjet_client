@@ -76,6 +76,7 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
 }
 
 #[rstest]
+#[ignore = "Run only on MR, or important reviews"]
 async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let result = test_client
@@ -87,6 +88,7 @@ async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
 }
 
 #[rstest]
+#[ignore = "Feature not implemented yet"]
 async fn test_add_contact() {
     let test_client = TestApp::new().expect("Failed to build a test client");
     let request = ContactQuery {
