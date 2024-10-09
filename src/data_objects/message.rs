@@ -93,7 +93,7 @@ impl RequestObject for SimpleMessage {
 /// ## Example
 ///
 /// ```
-/// use mailjet_client::MessageBuilder;
+/// use mailjet_client::data_objects::MessageBuilder;
 ///
 /// let message = MessageBuilder::default()
 ///     .with_from("john_doe@mail.com", Some("John Doe"))
