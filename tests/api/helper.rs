@@ -10,8 +10,10 @@ use mailjet_client::{
 };
 use once_cell::sync::Lazy;
 use secrecy::SecretString;
+use std::sync::Arc;
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::{fmt, layer::SubscriberExt, registry, util::SubscriberInitExt, Layer};
+use wiremock::MockServer;
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     // Build a `Subscriber` when TEST_LOG is set in the terminal session.
@@ -40,6 +42,7 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 
 pub struct TestApp {
     pub api_client: MailjetClient,
+    pub email_server: Option<Arc<MockServer>>,
 }
 
 impl TestApp {
@@ -59,10 +62,38 @@ impl TestApp {
             Some("Test"),
             None,
             None,
+            None,
         )
         .map_err(|_| anyhow!("Failed to build mailjet client"))?;
 
-        Ok(TestApp { api_client })
+        Ok(TestApp {
+            api_client,
+            email_server: None,
+        })
+    }
+
+    pub async fn spawn_app() -> Result<Self> {
+        Lazy::force(&TRACING);
+
+        // Instantiate a new mock HTTP server to handle requests to the external API.
+        let mock_server = MockServer::start().await;
+
+        let api_client = MailjetClient::new(
+            SecretString::new("None".into()),
+            SecretString::new("None".into()),
+            Some("Rust mailjet test agent"),
+            Some("admin@nubecita.eu"),
+            Some("Test"),
+            Some(&mock_server.uri()),
+            None,
+            Some(false),
+        )
+        .map_err(|_| anyhow!("Failed to build mailjet client"))?;
+
+        Ok(TestApp {
+            api_client,
+            email_server: Some(Arc::new(mock_server)),
+        })
     }
 
     pub async fn send_email_v3_1(

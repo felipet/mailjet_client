@@ -6,12 +6,17 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{ContactQuery, MessageBuilder, SendEmailParams, SimpleMessage},
+    data_objects::{ContactQuery, MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
+use serde::{Deserialize, Serialize};
 use std::mem::discriminant;
 use tracing::{debug, info};
+use wiremock::{
+    matchers::{method, path},
+    Mock, ResponseTemplate,
+};
 
 #[fixture]
 fn empty_email_request_v3_1() -> SendEmailParams {
@@ -41,6 +46,25 @@ async fn valid_email_request_v3() -> SimpleMessage {
         .expect("Failed to load valid message example from JSON file");
 
     serde_json::from_str(&valid_mail).expect("Failed to parse valid email JSON")
+}
+
+#[fixture]
+async fn valid_response_send_v3() -> ResponseTemplate {
+    #[derive(Serialize, Deserialize, Debug)]
+    #[serde(rename_all = "PascalCase")]
+    #[allow(dead_code)]
+    struct TempResponse {
+        pub sent: Vec<MessageObject>,
+    }
+
+    let example_response: TempResponse = serde_json::from_str(
+        &read_to_string("tests/api/data/response_send_v3.json")
+            .await
+            .expect("Failed to read the response template from a file"),
+    )
+    .expect("Failed");
+
+    ResponseTemplate::new(200).set_body_json(example_response)
 }
 
 /// Simple test case to check that we can send a request to the external API.
@@ -85,6 +109,34 @@ async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
 
     assert!(result.is_ok());
     debug!("Response: {:#?}", result.unwrap());
+}
+
+#[rstest]
+async fn mocktest_send_email_v3(
+    #[future] valid_email_request_v3: SimpleMessage,
+    #[future] valid_response_send_v3: ResponseTemplate,
+) {
+    let mut test_client = TestApp::spawn_app()
+        .await
+        .expect("Failed to build a mock test client");
+
+    Mock::given(path("/v3/send"))
+        .and(method("POST"))
+        .respond_with(valid_response_send_v3.await)
+        .mount(
+            test_client
+                .email_server
+                .as_deref()
+                .expect("Failed to get a reference to the mock server"),
+        )
+        .await;
+
+    let result = test_client
+        .send_email_v3(&valid_email_request_v3.await)
+        .await;
+
+    debug!("Response: {:#?}", result);
+    assert!(result.is_ok());
 }
 
 #[rstest]
