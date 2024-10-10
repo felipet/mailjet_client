@@ -1,10 +1,10 @@
 {
-    "FromEmail": "admin@nubecita.eu",
+    "FromEmail": "Your registered email should go here",
     "FromName": "Mailjet Client test",
     "Recipients":[
       {
-        "Email":"torresfelipex1@gmail.com",
-        "Name":"Passenger 1"
+        "Email":"pilot@mailjet.com",
+        "Name":"Your Mailjet Pilot"
       }
     ],
     "Subject":"Your email flight plan!",

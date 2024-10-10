@@ -20,6 +20,39 @@ However, none of those include some of the features that I need as I aim to inte
 
 Offering a full client implementation is not my initial plan, so **don't expect a full 1:1 Rust implementation of the existing API** clients provided by Mailjet. This project is open-sourced, so if you need to cover some missing endpoint of Mailjet's API, feel free to open a new Issue describing your needs. Either if you plan to develop it by yourself, or you need somebody else to do it, it will be good to know that there's interest on adding such missing feature to the client.
 
-## Contributing 
+## Running The Integration Tests
+
+This crate includes some integration tests to verify that the developed client works as expected. Endpoints of the external REST API that implement the latest version (v3.1) include an option to run in *sandbox mode*. That is really convenient to run tests without issuing real emails. However, most of the endpoints don't implement the latest version of the API, hence they don't allow using the *sandbox mode*.
+
+The crate [wiremock](https://crates.io/crates/wiremock) is used to mock the external API responses for the integration tests. However, some tests do actually send requests to the real API server. These tests are marked with the attribute `#[ignore]`, and they are only planned to be executed during merge requests or before issuing a new release of the crate.
+
+If you plan to contribute to this crate, or you simple aim to run all the integration tests, you'll need an account and an API key. Visit [Mailjet's Docs](https://app.mailjet.com/account/apikeys) to get more details about it. Once you've got a pair of API keys, and a validated email from which your enabled to send emails, set this environment variables in your shell session:
+
+```bash
+# This is what they call API KEY
+export MAILJET_API_USER=<hash>
+# This is what they call SECRET KEY
+export MAILJET_API_KEY=<hash>
+# This address must be registered in your Mailjet account
+export MAILJET_FROM_EMAIL=<email address>
+```
+
+Tests include tracing support. However, it is muted by default. If you need to enable the log, use the following environment variable:
+
+```bash
+export TEST_LOG=debug
+```
+
+Finally, export an email address to which you aim to send a test message:
+
+```bash
+export MAILJET_TEST_RECIPIENT=<email address>
+```
+
+If that variable is not set, emails will be send to a dummy account provided by Mailjet (pilot@mailjet.com).
+
+Use any valid value defined in the **tracing** crate as a level filter. Finally, a regular call to `cargo test` would run only the tests that use the mock server and the unit tests. If you need to run the set of tests that access Mailjet's API run: `cargo test -- --include-ignored`. You might also add a test filter to run only a particular ignored test. Bear in mind that running those tests will increase your sent email counter.
+
+## Contributing
 
 If you are interesting in contributing to this repository, feel free to contact me before starting to type new code as a crazy monkey.

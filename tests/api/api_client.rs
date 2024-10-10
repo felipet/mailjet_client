@@ -45,7 +45,19 @@ async fn valid_email_request_v3() -> SimpleMessage {
         .await
         .expect("Failed to load valid message example from JSON file");
 
-    serde_json::from_str(&valid_mail).expect("Failed to parse valid email JSON")
+    let mut message: SimpleMessage =
+        serde_json::from_str(&valid_mail).expect("Failed to parse valid email JSON");
+
+    let from_addr =
+        std::env::var("MAILJET_FROM_EMAIL").expect("Missing MAILJET_FROM_EMAIL env variable");
+
+    if let Ok(addr) = std::env::var("MAILJET_TEST_RECIPIENT") {
+        message.to = Some(addr);
+    }
+
+    message.from_email = from_addr;
+
+    message
 }
 
 #[fixture]
@@ -94,6 +106,22 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
     let result = test_client
         .send_email_v3_1(&valid_email_request_v3_1.await)
         .await;
+
+    debug!("Result: {:#?}", result);
+    assert!(result.is_ok());
+}
+
+/// Test case to check sending an email using real fire (no sandbox_mode activated.)
+#[rstest]
+#[ignore = "Run only on MR, or important reviews"]
+async fn test2_send_email_v3_1(#[future] valid_email_request_v3_1: SendEmailParams) {
+    let mut test_client = TestApp::new().expect("Failed to build a test client");
+
+    let mut message = valid_email_request_v3_1.await;
+    message.sandbox_mode = Some(false);
+    message.advance_error_handling = Some(true);
+
+    let result = test_client.send_email_v3_1(&message).await;
 
     debug!("Result: {:#?}", result);
     assert!(result.is_ok());

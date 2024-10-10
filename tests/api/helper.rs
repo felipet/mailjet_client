@@ -54,11 +54,19 @@ impl TestApp {
         let api_key =
             std::env::var("MAILJET_API_KEY").expect("Missing MAILJET_API_KEY env variable");
 
+        let email_address = match std::env::var("MAILJET_EMAIL") {
+            Ok(email) => email,
+            Err(_) => {
+                info!("Email used as sender not specified, using a dummy value");
+                "jane_doe@mail.com".into()
+            }
+        };
+
         let api_client = MailjetClient::new(
             SecretString::new(api_user.into()),
             SecretString::new(api_key.into()),
+            Some(&email_address),
             Some("Rust mailjet test agent"),
-            Some("admin@nubecita.eu"),
             Some("Test"),
             None,
             None,
@@ -81,14 +89,14 @@ impl TestApp {
         let api_client = MailjetClient::new(
             SecretString::new("None".into()),
             SecretString::new("None".into()),
-            Some("Rust mailjet test agent"),
-            Some("admin@nubecita.eu"),
+            Some("jane_doe@mail.com"),
+            Some("Jane Doe"),
             Some("Test"),
             Some(&mock_server.uri()),
             None,
             Some(false),
         )
-        .map_err(|_| anyhow!("Failed to build mailjet client"))?;
+        .map_err(|_| anyhow!("Failed to build Mailjet client"))?;
 
         Ok(TestApp {
             api_client,
