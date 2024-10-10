@@ -67,6 +67,7 @@ impl MailjetClient {
     /// - A variant of the `enum` [ClientError] otherwise.
     ///
     /// [api_doc]: https://dev.mailjet.com/email/guides/
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         api_user: SecretString,
         api_key: SecretString,
@@ -77,11 +78,11 @@ impl MailjetClient {
         api_version: Option<&str>,
         force_https: Option<bool>,
     ) -> Result<Self, ClientError> {
-        let user_agent: &str = if let Some(agent) = user_agent {
-            agent
-        } else {
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),)
-        };
+        let user_agent: &str = user_agent.unwrap_or(concat!(
+            env!("CARGO_PKG_NAME"),
+            "/",
+            env!("CARGO_PKG_VERSION"),
+        ));
 
         let api_url = match api_url {
             Some(url) => url.into(),
@@ -93,15 +94,10 @@ impl MailjetClient {
             None => ApiVersion::V3,
         };
 
-        let force_https = match force_https {
-            Some(f) => f,
-            None => true,
-        };
-
         let http_client = reqwest::ClientBuilder::new()
             .user_agent(user_agent)
             .use_native_tls()
-            .https_only(force_https)
+            .https_only(force_https.unwrap_or(true))
             .build()
             .map_err(|_| ClientError::HTTPClient)?;
 
