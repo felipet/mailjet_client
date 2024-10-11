@@ -178,7 +178,7 @@ mod tests {
         let name = "jane doe";
         let agent = "test agent";
 
-        let client_builder = MailjetClientBuilder::default()
+        let mut client_builder = MailjetClientBuilder::default()
             .with_api_key(api_key.clone())
             .with_api_user(api_user.clone())
             .with_email_address(email)
@@ -186,14 +186,18 @@ mod tests {
             .with_user_agent(agent)
             .with_api_version(&ApiVersion::default().to_string());
 
+        assert_eq!(client_builder.email_name, Some(name.into()));
+        assert_eq!(client_builder.user_agent, Some(agent.into()));
+        assert_eq!(
+            client_builder.api_version,
+            Some(ApiVersion::default().to_string())
+        );
+
+        assert_eq!(client_builder.force_https, Some(true));
+        client_builder = client_builder.with_https_enforcing(false);
+        assert_eq!(client_builder.force_https, Some(false));
         assert_eq!(client_builder.api_user.unwrap().expose_secret(), keys.user);
         assert_eq!(client_builder.api_key.unwrap().expose_secret(), keys.key);
-        assert_eq!(client_builder.email_name.unwrap(), name);
-        assert_eq!(client_builder.user_agent.unwrap(), agent);
-        assert_eq!(
-            client_builder.api_version.unwrap(),
-            ApiVersion::default().to_string()
-        );
 
         let client_builder = MailjetClientBuilder::default()
             .with_api_key(api_key)
