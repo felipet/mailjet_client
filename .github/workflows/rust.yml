@@ -45,6 +45,10 @@ jobs:
         run: cargo install cargo-tarpaulin
       - name: Tests
         run: cargo test
+        env:
+          MAILJET_USER_KEY: ${{ secrets.MAILJET_USER_KEY }}
+          MAILJET_USER_NAME: ${{ secrets.MAILJET_USER_NAME }}
+          MAILJET_FROM_EMAIL: ${{ vars.MAILJET_FROM_EMAIL }}
       - name: Generate code coverage
         run: cargo tarpaulin --verbose --all-features --timeout 120 --out xml
       - name: Upload coverage to codecov.io
