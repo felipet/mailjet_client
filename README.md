@@ -1,5 +1,8 @@
 # A Rust client for Mailjet's API
 
+[![codecov](https://codecov.io/github/felipet/mailjet_client/graph/badge.svg?token=EONZFSSFX1)](https://codecov.io/github/felipet/mailjet_client)
+![CI](https://github.com/felipet/mailjet_client/actions/workflows/rust.yml/badge.svg)
+
 This is another implementation of a client written in Rust for [Mailjet's API](https://dev.mailjet.com/email/reference/overview/).
 
 **What's [Mailjet](https://www.mailjet.com/)?** Mailjet is a web service that offers a platform for sending emails to many recipients using templates, and automations. Though they offer a nice and powerful web interface for their service, they also offer a REST API along a free tier for people sending low amounts of emails per month. This is a perfect combination for people that might need to deliver a few emails from a web service written in Rust (like me). However, they don't provide a Rust Client.
