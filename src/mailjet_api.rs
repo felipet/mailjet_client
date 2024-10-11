@@ -83,3 +83,48 @@ impl fmt::Display for ApiVersion {
         write!(f, "{version}")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+    use rstest::*;
+
+    #[rstest]
+    #[case("v3", "v3/send")]
+    #[case("v3.1", "v3.1/send")]
+    fn check_api_send(#[case] input: &str, #[case] expected: &str) {
+        let api_version = ApiVersion::try_from(input).expect("Failed to convert str to ApiVersion");
+
+        assert_eq!(ApiUrl::send(&api_version), expected.to_string());
+    }
+
+    #[rstest]
+    #[case("default", ClientError::WrongApiVersion)]
+    fn check_apiversion_fails_when_using_wrong_data(
+        #[case] input: &str,
+        #[case] expected: ClientError,
+    ) {
+        let api_version = ApiVersion::try_from(input);
+        assert!(api_version.is_err());
+        let error = api_version.err().unwrap();
+        assert_eq!(error, expected);
+    }
+
+    #[rstest]
+    fn check_api_contact() {
+        // TCs for REST API v3 (default)
+        let mut api_version = ApiVersion::default();
+
+        assert_eq!(ApiUrl::send(&api_version), "v3/send".to_string());
+
+        // TCs for REST API v3
+        api_version = ApiVersion::V3;
+
+        assert_eq!(ApiUrl::send(&api_version), "v3/send".to_string());
+
+        // TCs for REST API v3.1
+        api_version = ApiVersion::V3_1;
+        assert_eq!(ApiUrl::send(&api_version), "v3.1/send".to_string());
+    }
+}
