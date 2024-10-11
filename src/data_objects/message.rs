@@ -268,3 +268,27 @@ pub enum Track {
     #[serde(rename = "enabled")]
     Enabled,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+    use rstest::*;
+
+    #[rstest]
+    fn message_builds() {
+        let test_email = "test@mail.com";
+        let name = Some("name");
+        let body = "a test body";
+
+        let message = MessageBuilder::default()
+            .with_from(test_email, name)
+            .with_to(test_email, name)
+            .with_text_body(body)
+            .build();
+
+        assert_eq!(message.from.email, test_email);
+        assert_eq!(message.from.name.as_deref(), name);
+        assert_eq!(message.text_part.as_deref(), Some(body));
+    }
+}
