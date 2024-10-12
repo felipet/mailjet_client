@@ -304,46 +304,6 @@ impl MailjetClient {
             )))
         }
     }
-
-    #[instrument]
-    pub async fn add_contact(&self, request: &ContactQuery) -> Result<Response, ClientError> {
-        debug!("Request parameters: {:#?}", request);
-
-        // Build a new request using the HTTP client.
-        let request = self
-            .http_client
-            .post(format!(
-                "{}/{}",
-                self.api_url,
-                ApiUrl::contact(&self.api_version)
-            ))
-            .basic_auth(
-                self.api_user.expose_secret(),
-                Some(&self.api_key.expose_secret()),
-            )
-            .json(&request)
-            .build()
-            .unwrap();
-
-        trace!("POST request: {:#?}", request);
-
-        // Send the prepared request to the external API.
-        let raw_response = self
-            .http_client
-            .execute(request)
-            .await
-            .map_err(|e| ClientError::ExternalError(e.to_string()))?;
-        info!("Send request executed");
-        // This would log the main part of the response, the payload needs another iteration.
-        debug!("Received response: {:#?}", raw_response);
-        let response_payload = raw_response
-            .text()
-            .await
-            .map_err(|e| ClientError::UnknownError(e.to_string()))?;
-        debug!("Response's payload: {:#?}", response_payload);
-
-        todo!()
-    }
 }
 
 #[cfg(test)]
