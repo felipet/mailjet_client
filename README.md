@@ -2,6 +2,9 @@
 
 [![codecov](https://codecov.io/github/felipet/mailjet_client/graph/badge.svg?token=EONZFSSFX1)](https://codecov.io/github/felipet/mailjet_client)
 ![CI](https://github.com/felipet/mailjet_client/actions/workflows/rust.yml/badge.svg)
+![Crates.io Version](https://img.shields.io/crates/v/mailjet_client)
+![docs.rs](https://img.shields.io/docsrs/mailjet_client?label=docs.rs&link=https%3A%2F%2Fdocs.rs%2Fmailjet_client%2F0.1.0%2Fmailjet_client%2F)
+
 
 This is another implementation of a client written in Rust for [Mailjet's API](https://dev.mailjet.com/email/reference/overview/).
 
