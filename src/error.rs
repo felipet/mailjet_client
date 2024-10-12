@@ -3,8 +3,11 @@
 // This work is licensed under the terms of the MIT license.
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
+//! Custom error types.
+
 use thiserror::Error;
 
+/// Error types returned by the client.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum ClientError {
     #[error("An error was found in the internal HTTP Client")]
