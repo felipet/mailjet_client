@@ -1,3 +1,16 @@
+//! Code example to showcase how to send a simple message using [mailjet_client::MailjetClient] and the API version v3.
+//!
+//! # Description
+//!
+//! This example builds a new client using two environment variables: **MAILJET_API_USER** and **MAILJET_API_KEY**.
+//! These two variables must be defined in order to retrieve the credentials to use the external API.
+//!
+//! Then a simple client is build using the builder object ([mailjet_client::MailjetClientBuilder]), and an object
+//! [mailjet_client::data_objects::SimpleMessage] is created with the content of the email. Mailjet's dummy account
+//! is used for the shake of the example. Feel free to modify either or both *FromEmail* and/or *Recipients::email* to
+//! test this example with a real email account.
+//!
+//! Finally the request is sent to the external API, and the returned status code is checked.
 use mailjet_client::{data_objects::SimpleMessage, ClientError, MailjetClientBuilder};
 use secrecy::SecretString;
 use serde_json::json;
