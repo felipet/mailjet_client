@@ -7,7 +7,7 @@
 
 use crate::{
     data_objects::{
-        ContactQuery, MessageObject, RequestObject, Response, ResponseObject, SendEmailParams,
+        MessageObject, RequestObject, Response, ResponseObject, SendEmailParams,
         SendResponseObject, SimpleMessage,
     },
     mailjet_api::ApiUrl,
