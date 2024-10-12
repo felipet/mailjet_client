@@ -1,0 +1,12 @@
+{
+    "FromEmail": "Your registered email should go here",
+    "FromName": "Mailjet Client test",
+    "Recipients":[
+      {
+        "Email":"pilot@mailjet.com",
+        "Name":"Your Mailjet Pilot"
+      }
+    ],
+    "Subject":"Your email flight plan!",
+    "Text-part":"Dear passenger, welcome to Mailjet! May the delivery force be with you!"
+  }
