@@ -64,7 +64,7 @@
 //! At a bare minimum, you have to provide your API credentials to the client. Check [crate::MailjetClient::new]'s doc
 //! to get more details about those credentials. The rest of parameters are optional.
 //!
-//! ```rust,ignore
+//! ```verbatim
 //! let client = MailjetClientBuilder::new(api_user, api_key)
 //!     .build()
 //!     .expect("Failed to build a new Mailjet client");
@@ -76,7 +76,7 @@
 //! Then, composed a new email using either [crate::data_objects::SimpleMessage] (for API v3.0) or
 //! [crate::data_objects::SendEmailParams] (for API v3.1) and call the send method:
 //!
-//! ```rust, ignore
+//! ```verbatim
 //! let message = //...;
 //!
 //! let response = client.send_email(&message).await?;

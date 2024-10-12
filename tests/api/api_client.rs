@@ -6,7 +6,7 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{MessageBuilder, MessageObject, NameAndEmail, SendEmailParams, SimpleMessage},
+    data_objects::{MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
