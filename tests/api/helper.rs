@@ -5,7 +5,7 @@
 
 use anyhow::{anyhow, Result};
 use mailjet_client::{
-    data_objects::{ContactQuery, RequestObject, Response},
+    data_objects::{RequestObject, Response},
     ClientError, MailjetClient,
 };
 use once_cell::sync::Lazy;
@@ -122,9 +122,5 @@ impl TestApp {
         self.api_client
             .use_api_version(mailjet_client::ApiVersion::V3);
         self.api_client.send_email(request).await
-    }
-
-    pub async fn post_contact(&self, request: &ContactQuery) -> Result<Response, ClientError> {
-        self.api_client.add_contact(request).await
     }
 }

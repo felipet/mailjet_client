@@ -6,7 +6,7 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{ContactQuery, MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
+    data_objects::{MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
@@ -165,18 +165,4 @@ async fn mocktest_send_email_v3(
 
     debug!("Response: {:#?}", result);
     assert!(result.is_ok());
-}
-
-#[rstest]
-#[ignore = "Feature not implemented yet"]
-async fn test_add_contact() {
-    let test_client = TestApp::new().expect("Failed to build a test client");
-    let request = ContactQuery {
-        is_excluded_from_campaigns: Some(true),
-        email: "demo@mailjet.com".to_string(),
-        name: Some("John Doe".into()),
-    };
-    let result = test_client.post_contact(&request).await;
-
-    info!("{:#?}", result);
 }
