@@ -23,7 +23,15 @@ use tracing::{debug, error, info, instrument, trace};
 ///
 /// # Description
 ///
-/// TODO
+/// The member functions of this object match the names of the endpoints for Mailjet REST API.
+/// When you build a new instance of the client, you shall specify what API version you aim to use.
+/// However, you are free to change it using [MailjetClient::use_api_version]. The supported versions
+/// are listed by the `enum`: [crate::ApiVersion].
+///
+/// A fluent builder object is included to build a new client using [crate::MailjetClientBuilder] rather than using
+///  [MailjetClient::new].
+///
+/// For usage examples, visit the *examples* folder of this crate.
 ///
 /// [mapi]: https://dev.mailjet.com/email/reference/overview/
 #[derive(Debug)]
@@ -123,6 +131,17 @@ impl MailjetClient {
         self.api_version = version;
     }
 
+    /// Send a new email.
+    ///
+    /// # Description
+    ///
+    /// This is the public method to send a new email. Depending on the selected target API version, a different
+    /// type of object shall be passed as argument. Check out [crate::data_objects] docs.
+    ///
+    /// When the request is successfully sent to the external API, an `Ok(Response)` is returned from this method.
+    /// If the external API detected some issue with the content of your request, it will be signaled via
+    /// [Response::status_code], not as a [ClientError]. The latter is returned when a problem is detected in the
+    /// internal logic of this client.
     pub async fn send_email(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
         match self.api_version {
             ApiVersion::V3 => {
