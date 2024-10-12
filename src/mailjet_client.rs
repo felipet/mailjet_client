@@ -137,10 +137,7 @@ impl MailjetClient {
     }
 
     #[instrument]
-    pub async fn send_email_v3_1(
-        &self,
-        request: &impl RequestObject,
-    ) -> Result<Response, ClientError> {
+    async fn send_email_v3_1(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
         debug!("Request parameters: {:#?}", request);
 
         let request_params: &SendEmailParams =
@@ -219,10 +216,7 @@ impl MailjetClient {
     }
 
     #[instrument]
-    pub async fn send_email_v3(
-        &self,
-        request: &impl RequestObject,
-    ) -> Result<Response, ClientError> {
+    async fn send_email_v3(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
         debug!("Request parameters: {:#?}", request);
 
         // Try to cast the trait object as the expected params object.
