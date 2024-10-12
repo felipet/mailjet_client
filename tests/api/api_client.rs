@@ -6,7 +6,7 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
+    data_objects::{MessageBuilder, MessageObject, NameAndEmail, SendEmailParams, SimpleMessage},
     ClientError,
 };
 use rstest::*;
@@ -114,14 +114,30 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
 /// Test case to check sending an email using real fire (no sandbox_mode activated.)
 #[rstest]
 #[ignore = "Run only on MR, or important reviews"]
-async fn test2_send_email_v3_1(#[future] valid_email_request_v3_1: SendEmailParams) {
+async fn test2_send_email_v3_1() {
+    // First, try to read confidential variables from the environment.
+    let from_addr =
+        std::env::var("MAILJET_FROM_EMAIL").expect("Missing MAILJET_FROM_EMAIL env variable");
+
+    let test_recipient =
+        std::env::var("MAILJET_TEST_RECIPIENT").unwrap_or("pilot@mailjet.com".to_string());
+
     let mut test_client = TestApp::new().expect("Failed to build a test client");
 
-    let mut message = valid_email_request_v3_1.await;
-    message.sandbox_mode = Some(false);
-    message.advance_error_handling = Some(true);
+    let message = MessageBuilder::default()
+        .with_from(&from_addr, Some("Mailjet Rust Client"))
+        .with_to(&test_recipient, None)
+        .with_text_body("Test message sent from the Mailjet Rust Client")
+        .build();
 
-    let result = test_client.send_email_v3_1(&message).await;
+    let request = SendEmailParams {
+        sandbox_mode: Some(false),
+        advance_error_handling: Some(true),
+        globals: None,
+        messages: Vec::from([message]),
+    };
+
+    let result = test_client.send_email_v3_1(&request).await;
 
     debug!("Result: {:#?}", result);
     assert!(result.is_ok());
