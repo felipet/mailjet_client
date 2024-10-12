@@ -8,6 +8,7 @@ readme = "README.md"
 repository = "https://github.com/felipet/mailjet_client"
 categories = ["api-bindings", "email"]
 keywords = ["email", "mailjet"]
+license = "MIT"
 
 [dependencies]
 names = "0.14.0"
