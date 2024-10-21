@@ -111,6 +111,29 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
     assert!(result.is_ok());
 }
 
+/// Test case to check that the global _sandbox mode_ is really honored.
+#[rstest]
+async fn test_global_sandbox_mode(#[future] valid_email_request_v3_1: SendEmailParams) {
+    let mut test_client = TestApp::new().expect("Failed to build a test client");
+    let mut email_request = valid_email_request_v3_1.await.clone();
+    test_client.api_client.disable_sandbox_mode();
+
+    // The global sandbox mode is disabled, so the local value from the message shall prevail.
+    let result = test_client.send_email_v3_1(&email_request).await;
+
+    debug!("Result: {:#?}", result);
+    assert!(result.is_ok());
+
+    // Let's disable it in the message, and enable it globally.
+    email_request.sandbox_mode = Some(false);
+    test_client.api_client.enable_sandbox_mode();
+
+    let result = test_client.send_email_v3_1(&email_request).await;
+
+    debug!("Result: {:#?}", result);
+    assert!(result.is_ok());
+}
+
 /// Test case to check sending an email using real fire (no sandbox_mode activated.)
 #[rstest]
 #[ignore = "Run only on MR, or important reviews"]

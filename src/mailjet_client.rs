@@ -17,7 +17,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
-use tracing::{debug, error, info, instrument, trace};
+use tracing::{debug, error, info, instrument, trace, warn};
 
 /// This object implements a client for [Mailjet's][mapi] REST API.
 ///
@@ -33,6 +33,13 @@ use tracing::{debug, error, info, instrument, trace};
 ///
 /// For usage examples, visit the *examples* folder of this crate.
 ///
+/// ## Sandbox Mode
+///
+/// When using the external API >= 3.1, it is possible to specify if we aim to run our requests in _sandbox mode_.
+/// By default, this mode is disabled. Enable it using [MailjetClient::enable_sandbox_mode]. However, if the attribute
+/// is defined as part of [SendEmailParams], the local value is honored when the global _sandbox mode_ is disabled.
+///
+///
 /// [mapi]: https://dev.mailjet.com/email/reference/overview/
 #[derive(Debug)]
 pub struct MailjetClient {
@@ -43,6 +50,7 @@ pub struct MailjetClient {
     api_key: SecretString,
     api_url: String,
     api_version: ApiVersion,
+    sandbox_mode: bool,
 }
 
 impl MailjetClient {
@@ -123,12 +131,30 @@ impl MailjetClient {
             api_user,
             api_url,
             api_version,
+            sandbox_mode: false,
         })
     }
 
     /// Change the target external API version (Mailjet).
     pub fn use_api_version(&mut self, version: ApiVersion) {
         self.api_version = version;
+    }
+
+    /// Enable the _sandbox mode_ for sending messages.
+    pub fn enable_sandbox_mode(&mut self) {
+        if self.api_version == ApiVersion::V3 {
+            warn!("The sandbox mode is only available for API versions >= 3.1");
+        } else {
+            self.sandbox_mode = true;
+        }
+    }
+
+    /// Disable the _sandbox mode_ for sending messages.
+    pub fn disable_sandbox_mode(&mut self) {
+        if self.sandbox_mode {
+            info!("Sandbox mode disabled");
+            self.sandbox_mode = false;
+        }
     }
 
     /// Send a new email.
@@ -159,11 +185,17 @@ impl MailjetClient {
     async fn send_email_v3_1(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
         debug!("Request parameters: {:#?}", request);
 
-        let request_params: &SendEmailParams =
+        let mut request_params: SendEmailParams =
             match request.as_any().downcast_ref::<SendEmailParams>() {
-                Some(r) => r,
+                Some(r) => r.clone(),
                 None => return Err(ClientError::UnknownError("Invalid request".to_string())),
             };
+
+        // Apply the sandbox mode if needed.
+        if !request_params.sandbox_mode.unwrap_or_default() {
+            debug!("The global sandbox mode is applied to the current message");
+            request_params.sandbox_mode = Some(self.sandbox_mode);
+        }
 
         // Build a new request using the HTTP client.
         let request = self
@@ -392,5 +424,22 @@ mod tests {
         assert_eq!(client.api_version, ApiVersion::V3_1);
         client.use_api_version(ApiVersion::V3);
         assert_eq!(client.api_version, ApiVersion::V3);
+    }
+
+    #[rstest]
+    fn change_sandbox_mode() {
+        let mut client = MailjetClientBuilder::default().build().unwrap();
+        // The default value shall be always false.
+        assert_eq!(client.sandbox_mode, false);
+        // When using the API v3.0, sandbox mode is ignored.
+        client.enable_sandbox_mode();
+        assert_eq!(client.sandbox_mode, false);
+        // Finally, upgrade to the latest API version, and enable the sandbox mode.
+        client.use_api_version(ApiVersion::V3_1);
+        client.enable_sandbox_mode();
+        assert_eq!(client.sandbox_mode, true);
+        // And disable it.
+        client.disable_sandbox_mode();
+        assert_eq!(client.sandbox_mode, false);
     }
 }

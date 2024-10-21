@@ -15,7 +15,7 @@ use std::collections::HashMap;
 /// # Description
 ///
 /// This object matches the allowed parameters defined in [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send).
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Message {
     pub from: NameAndEmail,
@@ -54,7 +54,7 @@ pub struct Message {
 /// This object matches the allowed parameters defined in [`/send`](https://dev.mailjet.com/email/reference/send-emails#v3_1_post_send).
 /// However, some parameters are missing in this struct. Mostly, all the parameters that start by *Mj-* are
 /// skipped due to problems with the request.
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SimpleMessage {
     pub from_email: String,
@@ -150,6 +150,18 @@ impl MessageBuilder {
         self
     }
 
+    pub fn with_subject(mut self, subject: &str) -> Self {
+        self.subject = Some(subject.to_string());
+
+        self
+    }
+
+    pub fn with_html_body(mut self, body: &str) -> Self {
+        self.html_part = Some(body.to_string());
+
+        self
+    }
+
     pub fn build(self) -> Message {
         Message {
             from: self.from.unwrap_or_default(),
@@ -187,7 +199,7 @@ impl MessageBuilder {
 ///
 /// The parameters to send a message using the external API::v3.1 include a field named `Globals`. It is
 /// an object that is translated by this struct.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct MessageProperty {
     pub from: Option<NameAndEmail>,
@@ -219,7 +231,7 @@ pub struct MessageProperty {
 }
 
 /// Simple object that includes an email and a linked name (optional).
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct NameAndEmail {
     pub email: String,
@@ -250,7 +262,7 @@ impl NameAndEmail {
 }
 
 /// Attachment object.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Attachment {
     pub filename: String,
@@ -258,7 +270,7 @@ pub struct Attachment {
     pub base_64_content: String,
 }
 
-#[derive(Debug, Default, Serialize, PartialEq, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, PartialEq, Deserialize)]
 pub enum Track {
     #[default]
     #[serde(rename = "account_default")]
@@ -280,15 +292,20 @@ mod tests {
         let test_email = "test@mail.com";
         let name = Some("name");
         let body = "a test body";
+        let subject = "a test subject";
 
         let message = MessageBuilder::default()
+            .with_subject(subject)
             .with_from(test_email, name)
             .with_to(test_email, name)
             .with_text_body(body)
+            .with_html_body(body)
             .build();
 
         assert_eq!(message.from.email, test_email);
         assert_eq!(message.from.name.as_deref(), name);
         assert_eq!(message.text_part.as_deref(), Some(body));
+        assert_eq!(message.html_part.as_deref(), Some(body));
+        assert_eq!(message.subject.as_deref(), Some(subject));
     }
 }
