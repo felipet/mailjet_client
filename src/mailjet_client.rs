@@ -183,7 +183,7 @@ impl MailjetClient {
 
     #[instrument]
     async fn send_email_v3_1(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
-        debug!("Request parameters: {:#?}", request);
+        debug!("Request parameters: {:?}", request);
 
         let mut request_params: SendEmailParams =
             match request.as_any().downcast_ref::<SendEmailParams>() {
@@ -213,7 +213,7 @@ impl MailjetClient {
             .build()
             .unwrap();
 
-        debug!("POST request: {:#?}", request);
+        debug!("POST request: {:?}", request);
 
         // Send the prepared request to the external API.
         let raw_response = self
@@ -222,13 +222,13 @@ impl MailjetClient {
             .await
             .map_err(|e| ClientError::ExternalError(e.to_string()))?;
 
-        debug!("Received response: {:#?}", raw_response);
+        debug!("Received response: {:?}", raw_response);
         let response_code = raw_response.status().as_u16();
         let payload = raw_response
             .text()
             .await
             .map_err(|e| ClientError::UnknownError(e.to_string()))?;
-        debug!("Response's payload: {:#?}", payload);
+        debug!("Response's payload: {:?}", payload);
 
         // The POST request was successfully executed.
         if response_code == 200 {
@@ -255,12 +255,12 @@ impl MailjetClient {
             })
         } else if response_code == 400 {
             Err(ClientError::BadRequest(format!(
-                "status_code: {}, payload: {:#?}",
+                "status_code: {}, payload: {:?}",
                 response_code, payload
             )))
         } else {
             Err(ClientError::UnknownError(format!(
-                "status_code: {}, payload: {:#?}",
+                "status_code: {}, payload: {:?}",
                 response_code, payload
             )))
         }
@@ -268,7 +268,7 @@ impl MailjetClient {
 
     #[instrument]
     async fn send_email_v3(&self, request: &impl RequestObject) -> Result<Response, ClientError> {
-        debug!("Request parameters: {:#?}", request);
+        debug!("Request parameters: {:?}", request);
 
         // Try to cast the trait object as the expected params object.
         let request_params: &SimpleMessage = match request.as_any().downcast_ref::<SimpleMessage>()
@@ -298,7 +298,7 @@ impl MailjetClient {
             .build()
             .unwrap();
 
-        trace!("POST request: {:#?}", request);
+        trace!("POST request: {:?}", request);
 
         // Send the prepared request to the external API.
         let raw_response = self
@@ -308,14 +308,14 @@ impl MailjetClient {
             .map_err(|e| ClientError::ExternalError(e.to_string()))?;
         info!("Send request executed");
         // This would log the main part of the response, the payload needs another iteration.
-        debug!("Received response: {:#?}", raw_response);
+        debug!("Received response: {:?}", raw_response);
 
         let response_code = raw_response.status().as_u16();
         let response_payload = raw_response
             .text()
             .await
             .map_err(|e| ClientError::UnknownError(e.to_string()))?;
-        debug!("Response's payload: {:#?}", response_payload);
+        debug!("Response's payload: {:?}", response_payload);
 
         // The API docs state that 201 shall be received after a successful POST, however,
         // I only received 200. Both cases would be acceptable, though:
@@ -345,12 +345,12 @@ impl MailjetClient {
             })
         } else if response_code == 400 {
             Err(ClientError::BadRequest(format!(
-                "status_code: {}, payload: {:#?}",
+                "status_code: {}, payload: {:?}",
                 response_code, response_payload
             )))
         } else {
             Err(ClientError::UnknownError(format!(
-                "status_code: {}, payload: {:#?}",
+                "status_code: {}, payload: {:?}",
                 response_code, response_payload
             )))
         }
