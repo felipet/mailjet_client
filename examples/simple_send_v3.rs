@@ -2,7 +2,7 @@
 //!
 //! # Description
 //!
-//! This example builds a new client using two environment variables: **MAILJET_API_USER** and **MAILJET_API_KEY**.
+//! This example builds a new client using two environment variables: **MAILJET_API_KEY** and **MAILJET_SECRET_KEY**.
 //! These two variables must be defined in order to retrieve the credentials to use the external API.
 //!
 //! Then a simple client is build using the builder object ([mailjet_client::MailjetClientBuilder]), and an object
@@ -21,10 +21,10 @@ async fn main() -> Result<(), ClientError> {
     // Read the API user and key hashes from an environment variable and store them using Secrecy
     // to avoid data leaks.
     let api_user = SecretString::from(
-        env::var("MAILJET_API_USER").expect("Missing MAILJET_API_USER env variable"),
+        env::var("MAILJET_API_KEY").expect("Missing MAILJET_API_KEY env variable"),
     );
     let api_key = SecretString::from(
-        env::var("MAILJET_API_KEY").expect("Missing MAILJET_API_KEY env variable"),
+        env::var("MAILJET_SECRET_KEY").expect("Missing MAILJET_SECRET_KEY env variable"),
     );
 
     let mclient = MailjetClientBuilder::new(api_user, api_key)

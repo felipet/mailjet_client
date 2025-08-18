@@ -36,9 +36,9 @@ If you plan to contribute to this crate, or you simple aim to run all the integr
 
 ```bash
 # This is what they call API KEY
-export MAILJET_API_USER=<hash>
-# This is what they call SECRET KEY
 export MAILJET_API_KEY=<hash>
+# This is what they call SECRET KEY
+export MAILJET_SECRET_KEY=<hash>
 # This address must be registered in your Mailjet account
 export MAILJET_FROM_EMAIL=<email address>
 ```
