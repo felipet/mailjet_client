@@ -112,7 +112,6 @@ impl MailjetClient {
 
         let http_client = reqwest::ClientBuilder::new()
             .user_agent(user_agent)
-            .use_native_tls()
             .https_only(force_https.unwrap_or(true))
             .build()
             .map_err(|_| ClientError::HTTPClient)?;

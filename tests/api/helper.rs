@@ -50,9 +50,9 @@ impl TestApp {
         Lazy::force(&TRACING);
 
         let api_user =
-            std::env::var("MAILJET_API_USER").expect("Missing MAILJET_API_USER env variable");
-        let api_key =
             std::env::var("MAILJET_API_KEY").expect("Missing MAILJET_API_KEY env variable");
+        let api_key =
+            std::env::var("MAILJET_SECRET_KEY").expect("Missing MAILJET_SECRET_KEY env variable");
 
         let email_address = match std::env::var("MAILJET_EMAIL") {
             Ok(email) => email,
