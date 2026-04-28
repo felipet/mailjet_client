@@ -29,6 +29,7 @@ impl RequestObject for SendEmailParams {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Serialize, Debug, Clone, Default)]
 #[serde(rename_all = "PascalCase")]
 pub struct SenderQuery {
