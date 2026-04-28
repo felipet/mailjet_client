@@ -11,7 +11,7 @@
 //! test this example with a real email account.
 //!
 //! Finally the request is sent to the external API, and the returned status code is checked.
-use mailjet_client::{data_objects::SimpleMessage, ClientError, MailjetClientBuilder};
+use mailjet_client::{ClientError, MailjetClientBuilder, data_objects::SimpleMessage};
 use secrecy::SecretString;
 use serde_json::json;
 use std::env;

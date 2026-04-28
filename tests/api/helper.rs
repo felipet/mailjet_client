@@ -3,16 +3,16 @@
 // This work is licensed under the terms of the MIT license.
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use mailjet_client::{
-    data_objects::{RequestObject, Response},
     ClientError, MailjetClient,
+    data_objects::{RequestObject, Response},
 };
 use once_cell::sync::Lazy;
 use secrecy::SecretString;
 use std::sync::Arc;
 use tracing::{info, level_filters::LevelFilter};
-use tracing_subscriber::{fmt, layer::SubscriberExt, registry, util::SubscriberInitExt, Layer};
+use tracing_subscriber::{Layer, fmt, layer::SubscriberExt, registry, util::SubscriberInitExt};
 use wiremock::MockServer;
 
 static TRACING: Lazy<()> = Lazy::new(|| {

@@ -6,12 +6,12 @@
 //! Client module.
 
 use crate::{
+    ApiVersion, ClientError,
     data_objects::{
         MessageObject, RequestObject, Response, ResponseObject, SendEmailParams,
         SendResponseObject, SimpleMessage,
     },
     mailjet_api::ApiUrl,
-    ApiVersion, ClientError,
 };
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
