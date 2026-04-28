@@ -1,33 +1,36 @@
 [package]
-name = "mailjet_client"
-authors = ["Felipe Torres González <torresfelipex1@gmail.com>"]
-version = "0.3.0"
-edition = "2021"
-description = "A client for Mailjet's REST API"
-readme = "README.md"
-repository = "https://github.com/felipet/mailjet_client"
-categories = ["api-bindings", "email"]
-keywords = ["email", "mailjet"]
-license = "MIT"
+    name = "mailjet_client"
+    authors = [
+        "Felipe Torres González <torresfelipex1@gmail.com>",
+        "Michael Endsley <michael.endsley@protonmail.com>"
+    ]
+    version = "0.3.0"
+    edition = "2024"
+    description = "A client for Mailjet's REST API"
+    readme = "README.md"
+    repository = "https://github.com/felipet/mailjet_client"
+    categories = ["api-bindings", "email"]
+    keywords = ["email", "mailjet"]
+    license = "MIT"
 
 [dependencies]
-names = { version = "0.14.0", default_features = false }
-reqwest = { version = "0.12.7", features = ["rustls-tls", "json"] }
-reqwest-middleware = { version = "0.4.2", features = ["http2", "json"] }
-reqwest-tracing = "0.5.3"
-secrecy = "0.10.2"
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
-thiserror = "1.0.64"
-tracing = "0.1.40"
-uuid = { version = "1.10.0", features = ["v4", "serde"] }
+    names = { version = "0.14.0", default-features = false }
+    reqwest = { version = "0.13.3", features = ["rustls", "json"] }
+    reqwest-middleware = { version = "0.5.1", features = ["http2", "json"] }
+    reqwest-tracing = "0.7.0"
+    secrecy = "0.10.3"
+    serde = { version = "1.0.228", features = ["derive"] }
+    serde_json = "1.0.149"
+    thiserror = "1.0.64"
+    tracing = "0.1.44"
+    uuid = { version = "1.23.1", features = ["v4", "serde"] }
 
 [dev-dependencies]
-anyhow = "1.0.89"
-async-std = { version = "1.13", features = ["attributes", "tokio1"] }
-once_cell = "1.19.0"
-pretty_assertions = "1.4.1"
-rstest = "0.22.0"
-tokio = { version = "1.40.0", features = ["full"] }
-tracing-subscriber = { version = "0.3.18", default-features = false, features = ["std", "fmt", "ansi"] }
-wiremock = "0.5"
+    anyhow = "1.0.89"
+    async-std = { version = "1.13", features = ["attributes", "tokio1"] }
+    once_cell = "1.19.0"
+    pretty_assertions = "1.4.1"
+    rstest = "0.26.1"
+    tokio = { version = "1.52.1", features = ["full"] }
+    tracing-subscriber = { version = "0.3.23", default-features = false, features = ["std", "fmt", "ansi"] }
+    wiremock = "0.6.5"

@@ -6,16 +6,16 @@
 use crate::helper::TestApp;
 use async_std::fs::read_to_string;
 use mailjet_client::{
-    data_objects::{MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
     ClientError,
+    data_objects::{MessageBuilder, MessageObject, SendEmailParams, SimpleMessage},
 };
 use rstest::*;
 use serde::{Deserialize, Serialize};
 use std::mem::discriminant;
 use tracing::{debug, info};
 use wiremock::{
-    matchers::{method, path},
     Mock, ResponseTemplate,
+    matchers::{method, path},
 };
 
 #[fixture]
@@ -86,6 +86,7 @@ async fn valid_response_send_v3() -> ResponseTemplate {
 /// This TC sends a dummy request to the external API to send a message. However, the content of the request is
 /// empty, thus the POST is expected to fail with a 400 code.
 #[rstest]
+#[tokio::test]
 async fn test_send_empty_email_v3_1(empty_email_request_v3_1: SendEmailParams) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let result = test_client.send_email_v3_1(&empty_email_request_v3_1).await;
@@ -101,6 +102,7 @@ async fn test_send_empty_email_v3_1(empty_email_request_v3_1: SendEmailParams) {
 
 /// Test case to check whether we are able to send a valid email (sandbox_mode activated).
 #[rstest]
+#[tokio::test]
 async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmailParams) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let result = test_client
@@ -113,6 +115,7 @@ async fn test_send_valid_email_v3_1(#[future] valid_email_request_v3_1: SendEmai
 
 /// Test case to check that the global _sandbox mode_ is really honored.
 #[rstest]
+#[tokio::test]
 async fn test_global_sandbox_mode(#[future] valid_email_request_v3_1: SendEmailParams) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let mut email_request = valid_email_request_v3_1.await.clone();
@@ -137,6 +140,7 @@ async fn test_global_sandbox_mode(#[future] valid_email_request_v3_1: SendEmailP
 /// Test case to check sending an email using real fire (no sandbox_mode activated.)
 #[rstest]
 #[ignore = "Run only on MR, or important reviews"]
+#[tokio::test]
 async fn test2_send_email_v3_1() {
     // First, try to read confidential variables from the environment.
     let from_addr =
@@ -168,6 +172,7 @@ async fn test2_send_email_v3_1() {
 
 #[rstest]
 #[ignore = "Run only on MR, or important reviews"]
+#[tokio::test]
 async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
     let mut test_client = TestApp::new().expect("Failed to build a test client");
     let result = test_client
@@ -179,6 +184,7 @@ async fn test_send_email_v3(#[future] valid_email_request_v3: SimpleMessage) {
 }
 
 #[rstest]
+#[tokio::test]
 async fn mocktest_send_email_v3(
     #[future] valid_email_request_v3: SimpleMessage,
     #[future] valid_response_send_v3: ResponseTemplate,
