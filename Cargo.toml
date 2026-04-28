@@ -4,7 +4,7 @@
         "Felipe Torres González <torresfelipex1@gmail.com>",
         "Michael Endsley <michael.endsley@protonmail.com>"
     ]
-    version = "0.3.0"
+    version = "0.4.0"
     edition = "2024"
     description = "A client for Mailjet's REST API"
     readme = "README.md"

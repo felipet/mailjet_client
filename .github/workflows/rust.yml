@@ -45,13 +45,13 @@ jobs:
         run: cargo test
         env:
           MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
-          MAILJET_API_USER: ${{ secrets.MAILJET_API_USER }}
+          MAILJET_SECRET_KEY: ${{ secrets.MAILJET_SECRET_KEY }}
           MAILJET_FROM_EMAIL: ${{ vars.MAILJET_FROM_EMAIL }}
       - name: Generate code coverage
         run: cargo tarpaulin --verbose --all-features --timeout 120 --out xml
         env:
             MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
-            MAILJET_API_USER: ${{ secrets.MAILJET_API_USER }}
+            MAILJET_SECRET_KEY: ${{ secrets.MAILJET_SECRET_KEY }}
             MAILJET_FROM_EMAIL: ${{ vars.MAILJET_FROM_EMAIL }}
       - name: Upload coverage to codecov.io
         uses: codecov/codecov-action@v4.5.0
